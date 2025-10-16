@@ -10,7 +10,7 @@ hammer.sh is a powerful code generator that helps you quickly scaffold new bash 
 
 - 🔨 Generate projects from templates
 - 🎨 Variable substitution in templates
-- 📦 Built-in templates (arty.sh, starter)
+- 📦 Built-in templates (arty.sh, starter, leaf)
 - 🔧 Fully configurable
 - 🚀 Easy to extend with custom templates
 
@@ -36,6 +36,9 @@ hammer arty my-lib-manager
 
 # Generate a starter bash project
 hammer starter my-project
+
+# Generate a documentation site generator
+hammer leaf my-docs-generator
 
 # Generate with custom directory
 hammer starter my-app --dir ./projects
@@ -125,6 +128,59 @@ cd my-project
 chmod +x index.sh
 ./index.sh
 ```
+
+### leaf Template
+
+Generates a beautiful static documentation site generator for arty.sh projects.
+
+**Features:**
+- Modern, responsive design with Tailwind CSS v4
+- Automatic parsing of arty.yml, README.md, and project files
+- Syntax highlighting with Highlight.js
+- Dark/light theme toggle with localStorage persistence
+- Source file and examples display
+- Project icon integration
+- Mobile-friendly layout
+- Single-file HTML output
+
+**Generated files:**
+- `leaf.sh` - Main documentation generator script
+- `arty.yml` - Project configuration
+- `README.md` - Documentation for the generator
+- `.gitignore` - Git ignore file
+- `LICENSE` - MIT license
+
+**Usage:**
+```bash
+hammer leaf my-docs-generator
+cd my-docs-generator
+chmod +x leaf.sh
+
+# Generate docs for any arty.sh project
+./leaf.sh /path/to/your/arty-project
+
+# Or generate docs for current directory
+./leaf.sh
+
+# Open the generated documentation
+open docs/index.html
+```
+
+**Example Output:**
+The generator creates a beautiful single-page documentation site with:
+- Hero section with project icon and metadata
+- Overview section from README.md
+- Source files with syntax-highlighted code
+- Examples section with all example files
+- Smooth scrolling navigation
+- Interactive dark/light theme switcher
+
+**Perfect for:**
+- Creating project documentation websites
+- Showcasing bash libraries
+- Generating API documentation
+- Building developer guides
+- Sharing code examples
 
 ## Template Variables
 
@@ -271,12 +327,19 @@ hammer.sh/
 │   │   ├── .gitignore
 │   │   ├── setup.sh
 │   │   └── LICENSE
-│   └── starter/              # Starter template
+│   ├── starter/              # Starter template
+│   │   ├── .template
+│   │   ├── arty.yml
+│   │   ├── index.sh
+│   │   ├── README.md
+│   │   └── .gitignore
+│   └── leaf/           # Documentation generator
 │       ├── .template
+│       ├── leaf.sh
 │       ├── arty.yml
-│       ├── index.sh
 │       ├── README.md
-│       └── .gitignore
+│       ├── .gitignore
+│       └── LICENSE
 └── README.md
 
 judge.sh/                     # Example project
