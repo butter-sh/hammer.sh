@@ -1,67 +1,81 @@
 # {{project_name}}
 
-🎨 SVG to Icon Font Generator using native Linux/Unix tools
+🎭 SVG to Icon Set Generator using CSS mask-image
 
-Generate beautiful icon fonts from SVG files using FontForge, Python, and Bash - no Node.js required!
+Generate beautiful icon sets from SVG files using modern CSS `mask-image` with embedded data URLs - no web fonts needed!
 
 ## Features
 
-- ✨ Generate web fonts from SVG files (TTF, WOFF, WOFF2, SVG)
-- 🎯 Automatic SVG normalization (24x24, centered, currentColor)
-- 💅 Beautiful interactive showcase with Tailwind 4
-- 🔍 Real-time icon search with keyboard shortcuts
-- 📋 One-click copy icon class names
-- 🎨 Modern glassmorphism design with theme switching
-- 🚀 Fast and lightweight - pure bash/Python/FontForge
-- 🐧 Linux-native tooling (FontForge)
+- ✨ **CSS mask-image** - No web fonts, just modern CSS
+- 🎨 **Perfect currentColor** - Icons inherit text color naturally
+- 📦 **Embedded data URLs** - SVGs embedded directly in CSS
+- 💅 **Beautiful showcase** - Interactive gallery with Tailwind 4
+- 🔍 **Real-time search** - Filter icons instantly
+- 📋 **One-click copy** - Copy class names to clipboard
+- 🎯 **Size variants** - From xs to 3xl
+- 🚀 **Lightweight** - Only Python 3 required!
+- 🌈 **Theme support** - Works perfectly with color schemes
+
+## Technology
+
+This generator uses **CSS `mask-image`** instead of traditional web fonts:
+
+```css
+.icon {
+  mask-image: url('data:image/svg+xml,...');
+  background-color: currentColor;
+}
+```
+
+### Benefits
+
+- ✅ **No font files** - No TTF, WOFF, WOFF2 needed
+- ✅ **Perfect color** - Uses currentColor natively
+- ✅ **Modern** - Clean, CSS-only approach
+- ✅ **Flexible** - Easy to modify and customize
+- ✅ **Lightweight** - Smaller than font files
+
+### Browser Support
+
+- Chrome 120+
+- Firefox 53+
+- Safari 15.4+
+- Edge 120+
 
 ## Dependencies
 
 ### Required
 
-- **Python 3** - For SVG processing
-- **FontForge** - For font generation
+- **Python 3** - For SVG processing (that's it!)
 
-### Optional (Recommended)
-
-- **Inkscape** - Better SVG handling
-- **Potrace** - Vector tracing
-- **woff2** - WOFF2 compression
-
-## Installation
-
-### Install Dependencies
+### Installation
 
 **Ubuntu/Debian:**
 ```bash
-sudo apt-get update
-sudo apt-get install python3 fontforge inkscape potrace woff2
+sudo apt-get install python3
 ```
 
-**Fedora/RHEL/CentOS:**
+**macOS:**
 ```bash
-sudo dnf install python3 fontforge inkscape potrace woff2
+brew install python3
 ```
 
-**Arch Linux:**
+**Fedora/RHEL:**
 ```bash
-sudo pacman -S python fontforge inkscape potrace woff2
+sudo dnf install python3
 ```
 
-**macOS (Homebrew):**
-```bash
-brew install python fontforge inkscape potrace woff2
-```
+## Installation
 
-### Install via hammer.sh
+### Via hammer.sh
 
 ```bash
-hammer.sh icony my-icon-font
-cd my-icon-font
+hammer.sh icony my-icon-set
+cd my-icon-set
 chmod +x icony.sh
 ```
 
-### Manual Installation
+### Manual
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/{{project_name}}.git
@@ -73,7 +87,7 @@ bash setup.sh
 
 1. **Add your SVG icons** to the `icons/` directory
 
-2. **Generate the icon font:**
+2. **Generate the icon set:**
    ```bash
    bash icony.sh generate
    ```
@@ -82,20 +96,20 @@ bash setup.sh
    ```bash
    bash icony.sh serve
    ```
-   Then open http://localhost:8080 in your browser
+   Then open http://localhost:8080
 
 ## Usage
 
 ### Commands
 
 ```bash
-# Initialize project with example icons
+# Initialize with example icons
 bash icony.sh init
 
-# Generate icon font from SVG files
+# Generate icon set from SVG files
 bash icony.sh generate
 
-# Serve the showcase with HTTP server
+# Serve the showcase
 bash icony.sh serve
 
 # Clean generated files
@@ -107,8 +121,6 @@ bash icony.sh help
 
 ### Environment Variables
 
-Customize the generation process:
-
 ```bash
 # Custom input directory
 INPUT_DIR=./my-icons bash icony.sh generate
@@ -116,24 +128,24 @@ INPUT_DIR=./my-icons bash icony.sh generate
 # Custom output directory
 OUTPUT_DIR=./build bash icony.sh generate
 
-# Custom font name
+# Custom CSS filename
 FONT_NAME=myicons bash icony.sh generate
 
-# Custom font family
-FONT_FAMILY=MyIconFont bash icony.sh generate
+# Custom icon class name
+ICON_CLASS=ico bash icony.sh generate
 
-# Combine multiple variables
-INPUT_DIR=./svg OUTPUT_DIR=./dist FONT_NAME=custom bash icony.sh generate
+# Combine all
+INPUT_DIR=./svg OUTPUT_DIR=./dist FONT_NAME=custom ICON_CLASS=i bash icony.sh generate
 ```
 
 ## SVG Requirements
 
-Your SVG files will be automatically normalized to:
+Your SVG files will be automatically normalized:
 - **24x24px** viewBox
-- **currentColor** fill (inherits text color)
+- **Black fill** (for mask-image)
 - **Centered** alignment
 
-No manual preparation needed! Just add your SVGs to the icons directory.
+No manual preparation needed!
 
 ## Using the Generated Icons
 
@@ -143,120 +155,131 @@ No manual preparation needed! Just add your SVGs to the icons directory.
 <!-- Include the CSS -->
 <link rel="stylesheet" href="dist/iconset.css">
 
-<!-- Use icons with classes -->
+<!-- Basic usage -->
 <i class="icon icon-heart"></i>
-<span class="icon icon-star"></span>
-<button>
-  <i class="icon icon-home"></i>
-  Home
-</button>
+<i class="icon icon-star"></i>
+<i class="icon icon-home"></i>
+
+<!-- With size variants -->
+<i class="icon icon-heart icon-xs"></i>
+<i class="icon icon-heart icon-sm"></i>
+<i class="icon icon-heart icon-lg"></i>
+<i class="icon icon-heart icon-xl"></i>
+<i class="icon icon-heart icon-2xl"></i>
+<i class="icon icon-heart icon-3xl"></i>
+
+<!-- With color (uses currentColor) -->
+<i class="icon icon-heart" style="color: red;"></i>
+<span class="icon icon-star" style="color: #fbbf24;"></span>
 ```
 
-### In CSS
+### Size Variants
+
+| Class | Size |
+|-------|------|
+| `icon-xs` | 0.75em |
+| `icon-sm` | 0.875em |
+| (default) | 1em |
+| `icon-lg` | 1.25em |
+| `icon-xl` | 1.5em |
+| `icon-2xl` | 2em |
+| `icon-3xl` | 3em |
+
+### Color Theming
+
+Icons automatically use `currentColor`:
+
+```html
+<!-- Red icon -->
+<div style="color: red;">
+  <i class="icon icon-heart"></i>
+</div>
+
+<!-- Blue icon -->
+<div class="text-blue-500">
+  <i class="icon icon-star"></i>
+</div>
+
+<!-- Custom color -->
+<i class="icon icon-home" style="color: #10b981;"></i>
+```
+
+### CSS Styling
 
 ```css
-/* Icons inherit the current text color */
-.my-button {
-  color: #ff0000;
+/* Change icon color */
+.icon {
+  color: #3b82f6;
 }
 
-.my-button .icon {
+/* Custom size */
+.icon-custom {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+/* With Tailwind */
+.text-red-500 .icon {
   /* Icon will be red */
-  font-size: 1.5rem;
 }
 ```
 
 ### Icon Classes
 
-Every icon gets a class based on its filename:
+Filename → CSS Class:
 - `home.svg` → `.icon-home`
 - `arrow-right.svg` → `.icon-arrow-right`
 - `user-circle.svg` → `.icon-user-circle`
 
 ## Output Structure
 
-After running `generate`, you'll have:
+After running `generate`:
 
 ```
 dist/
-├── iconset.ttf          # TrueType font
-├── iconset.woff         # WOFF font
-├── iconset.woff2        # WOFF2 font (if woff2 installed)
-├── iconset.svg          # SVG font
-├── iconset.css          # CSS stylesheet
-└── index.html           # Interactive showcase
+├── iconset.css       # Icon stylesheet with mask-image
+└── index.html        # Interactive showcase
 ```
 
 ## Showcase Features
 
 The generated `index.html` includes:
 
-- 🎨 **Beautiful Design**: Modern glassmorphism with gradient backgrounds
-- 🔍 **Live Search**: Filter icons in real-time (Press `/` to focus search)
-- 📋 **Copy to Clipboard**: Click copy button on any icon
-- 🎭 **Hover Effects**: Smooth animations and interactions
-- 🌈 **Theme Toggle**: Multiple color schemes
-- 📱 **Responsive**: Works on all devices
-- ⌨️ **Keyboard Shortcuts**: 
-  - `/` - Focus search
-  - `Esc` - Clear search and blur input
+- 🎨 **Beautiful Design** - Modern glassmorphism
+- 🔍 **Live Search** - Press `/` to search
+- 📋 **Copy Classes** - One-click copy
+- 🌈 **Theme Toggle** - Multiple color schemes
+- 📱 **Responsive** - Works on all devices
+- ⌨️ **Keyboard Shortcuts** - `/` to search, `Esc` to clear
+- 📖 **Usage Examples** - Code samples included
 
 ## How It Works
 
 1. **SVG Normalization** (Python)
    - Parses SVG files
-   - Sets viewBox to 24x24
-   - Replaces colors with `currentColor`
+   - Sets 24x24 viewBox
+   - Converts to black fill (for mask)
    - Centers content
 
-2. **Font Generation** (FontForge)
-   - Creates font file
-   - Maps each SVG to Unicode Private Use Area (U+E000+)
-   - Scales and centers glyphs
-   - Exports to multiple formats
+2. **Data URL Generation** (Bash + Python)
+   - Converts SVG to data URL
+   - URL-encodes for CSS
+   - Embeds in stylesheet
 
 3. **CSS Generation** (Bash)
-   - Creates @font-face rules
-   - Generates icon classes with Unicode mappings
-   - Adds base icon styles
+   - Creates icon classes
+   - Uses `mask-image` property
+   - Applies `currentColor` via `background-color`
 
-4. **Showcase Generation** (Bash)
-   - Creates responsive HTML gallery
-   - Adds search and copy functionality
-   - Includes Tailwind 4 styling
+4. **Showcase** (Bash)
+   - Interactive HTML gallery
+   - Search and filter
+   - Copy functionality
+   - Tailwind 4 styling
 
 ## Examples
 
-### Basic Usage
-
-```bash
-# Create project
-mkdir my-icons && cd my-icons
-
-# Initialize with examples
-bash icony.sh init
-
-# Add your SVGs to icons/ directory
-
-# Generate
-bash icony.sh generate
-
-# View showcase
-bash icony.sh serve
-```
-
-### Custom Configuration
-
-```bash
-# Generate with custom settings
-INPUT_DIR=./svg-files \
-OUTPUT_DIR=./public/fonts \
-FONT_NAME=my-icon-set \
-FONT_FAMILY=MyIcons \
-bash icony.sh generate
-```
-
-### Integration Example
+### Basic Integration
 
 ```html
 <!DOCTYPE html>
@@ -269,14 +292,11 @@ bash icony.sh generate
       align-items: center;
       gap: 0.5rem;
       padding: 0.5rem 1rem;
-      background: #3b82f6;
       color: white;
+      background: #3b82f6;
       border: none;
       border-radius: 0.375rem;
       cursor: pointer;
-    }
-    .btn .icon {
-      font-size: 1.25rem;
     }
   </style>
 </head>
@@ -285,88 +305,120 @@ bash icony.sh generate
     <i class="icon icon-heart"></i>
     Like
   </button>
-  
-  <button class="btn">
-    <i class="icon icon-star"></i>
-    Favorite
-  </button>
-  
-  <button class="btn">
-    <i class="icon icon-home"></i>
-    Home
-  </button>
 </body>
 </html>
 ```
 
+### With Tailwind CSS
+
+```html
+<div class="flex items-center gap-2 text-blue-600">
+  <i class="icon icon-star icon-lg"></i>
+  <span class="font-semibold">Featured</span>
+</div>
+
+<div class="flex items-center gap-2 text-red-500">
+  <i class="icon icon-heart icon-xl"></i>
+  <span>Favorites</span>
+</div>
+```
+
+### Dark Mode
+
+```css
+/* Light mode */
+.icon {
+  color: #1f2937;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .icon {
+    color: #f3f4f6;
+  }
+}
+```
+
 ## Best Practices
 
-1. **Naming**: Use descriptive, kebab-case filenames (e.g., `arrow-right.svg`)
-2. **Size**: Keep SVGs simple for smaller font files
-3. **Colors**: Original SVG colors are replaced with `currentColor`
-4. **Organization**: Group related icons in subdirectories (processed recursively)
-5. **Testing**: Always view the showcase to verify icons look correct
+1. **Naming** - Use kebab-case: `arrow-right.svg`
+2. **Simplicity** - Keep SVGs simple for smaller CSS
+3. **Colors** - Original colors are converted to black for mask
+4. **Testing** - Check in modern browsers
+
+## Advantages Over Web Fonts
+
+| Feature | Web Fonts | CSS mask-image |
+|---------|-----------|----------------|
+| **File Size** | Separate font files | Embedded in CSS |
+| **Color Control** | Limited | Perfect currentColor |
+| **Loading** | Extra HTTP request | Inline in CSS |
+| **Flexibility** | Font metrics | Pure CSS |
+| **Modification** | Regenerate font | Edit CSS |
+| **Dependencies** | FontForge | Just Python |
+
+## Browser Compatibility
+
+CSS `mask-image` is widely supported:
+
+- ✅ Chrome 120+ (Dec 2023)
+- ✅ Firefox 53+ (Apr 2017)
+- ✅ Safari 15.4+ (Mar 2022)
+- ✅ Edge 120+ (Dec 2023)
+
+For older browsers, consider a fallback or use the web font version.
 
 ## Troubleshooting
 
 ### Icons not showing?
 
-- Verify CSS is properly loaded
-- Check browser console for errors
-- Ensure correct class names (based on filenames)
-- Check that font files are accessible
+- Check browser supports `mask-image`
+- Verify CSS is loaded
+- Ensure correct class names
 
-### Font generation fails?
+### Colors not working?
 
-- Install FontForge: See installation instructions above
-- Check SVG files are valid XML
-- Try running `bash icony.sh clean` first
-- Ensure Python 3 is installed
-
-### Missing WOFF2 files?
-
-- Install woff2 tools: `sudo apt-get install woff2`
-- WOFF2 is optional but recommended for smaller file sizes
+- Icons use `currentColor`
+- Set color on parent or icon element
+- Check CSS specificity
 
 ### Python errors?
 
-- Ensure Python 3 is installed: `python3 --version`
-- Check that python3 is in your PATH
+```bash
+python3 --version  # Should be 3.x
+```
 
-## Why No Node.js?
+## Migration from Web Fonts
 
-This project uses native Linux/Unix tools for several reasons:
+If you have existing icon font code:
 
-- ✅ **Lighter dependencies** - No npm packages to install
-- ✅ **More stable** - FontForge is battle-tested font software
-- ✅ **Better integration** - Works seamlessly with system tools
-- ✅ **Educational** - Learn how font generation actually works
-- ✅ **Server-friendly** - Easier to deploy on Linux servers
+**Before (web font):**
+```html
+<i class="icon icon-heart"></i>
+```
 
-## Technical Details
+**After (mask-image):**
+```html
+<i class="icon icon-heart"></i>
+```
 
-### Font Metrics
+The HTML is the same! Just replace the CSS file.
 
-- **Em size**: 1000 units
-- **Ascent**: 800 units
-- **Descent**: 200 units
-- **Glyph size**: Auto-scaled to fit 800×800 box
-- **Unicode range**: U+E000 to U+F8FF (Private Use Area)
+## Why mask-image?
 
-### Supported Formats
-
-- **TTF** - TrueType (universal support)
-- **WOFF** - Web Open Font Format (good compression)
-- **WOFF2** - WOFF2 (best compression, requires woff2 tools)
-- **SVG** - SVG Font (legacy support)
+- 🚀 **Modern** - Uses cutting-edge CSS
+- 🎨 **Better** - Perfect color control
+- 📦 **Simpler** - No font files
+- ⚡ **Faster** - Inline in CSS
+- 🔧 **Flexible** - Easy to customize
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! Please submit a Pull Request.
 
 ## License
 
-MIT License - see LICENSE file for details
+MIT License - see LICENSE file
 
 ---
 

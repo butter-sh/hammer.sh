@@ -1,2 +1,2 @@
-description="SVG to icon font generator with web showcase"
-version="1.0.0"
+description="SVG to icon set generator using CSS mask-image (no fonts needed!)"
+version="2.0.0"
