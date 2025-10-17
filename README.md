@@ -1,23 +1,23 @@
 # hammer.sh
 
-A configurable bash project generator CLI that creates projects from templates.
+> 🔨 A configurable bash project generator CLI that creates projects from templates
 
-## Overview
+A powerful code generator that helps you quickly scaffold new bash projects from customizable templates. Part of the butter.sh ecosystem.
 
-hammer.sh is a powerful code generator that helps you quickly scaffold new bash projects from customizable templates. It comes with built-in templates for creating library managers, starter projects, and more.
-
-## Features
+## 🌟 Features
 
 - 🔨 Generate projects from templates
 - 🎨 Variable substitution in templates
-- 📦 Built-in templates (arty.sh, starter, leaf)
+- 📦 Built-in templates (arty, starter, leaf, init, judge, icony)
 - 🔧 Fully configurable
 - 🚀 Easy to extend with custom templates
+- ⚡ Fast and lightweight
+- 🎯 Smart overwrite handling
 
-## Installation
+## 📦 Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/hammer.sh.git
+git clone https://github.com/butter-sh/hammer.sh.git
 cd hammer.sh
 chmod +x hammer.sh
 
@@ -25,29 +25,32 @@ chmod +x hammer.sh
 sudo ln -s "$(pwd)/hammer.sh" /usr/local/bin/hammer
 ```
 
-## Quick Start
+### One-liner Install
+
+```bash
+curl -sSL https://raw.githubusercontent.com/butter-sh/hammer.sh/main/hammer.sh | sudo tee /usr/local/bin/hammer > /dev/null && sudo chmod +x /usr/local/bin/hammer
+```
+
+## 🚀 Quick Start
 
 ```bash
 # List available templates
 hammer --list
 
-# Generate a new arty.sh library manager
-hammer arty my-lib-manager
+# Generate projects
+hammer arty my-lib-manager        # Library manager
+hammer starter my-project         # Basic project
+hammer leaf my-docs-gen          # Documentation generator
+hammer init project-initializer   # Project scaffolder (NEW!)
+hammer icony my-icon-tool        # SVG icon manager
+hammer judge test-framework      # Testing framework
 
-# Generate a starter bash project
-hammer starter my-project
-
-# Generate a documentation site generator
-hammer leaf my-docs-generator
-
-# Generate with custom directory
+# With options
 hammer starter my-app --dir ./projects
-
-# Generate with variables
-hammer starter my-app -v author="John Doe" -v license=MIT
+hammer arty my-lib -v author="John Doe" -v license=MIT --force
 ```
 
-## Usage
+## 📖 Usage
 
 ```bash
 hammer.sh <template> <project-name> [options]
@@ -55,10 +58,13 @@ hammer.sh <template> <project-name> [options]
 
 ### Options
 
-- `-d, --dir <path>` - Target directory (default: current directory)
-- `-v, --vars <key=value>` - Set template variables (can be repeated)
-- `-l, --list` - List available templates
-- `-h, --help` - Show help message
+| Option | Description |
+|--------|-------------|
+| `-d, --dir <path>` | Target directory (default: current) |
+| `-v, --vars <key=value>` | Set template variables (repeatable) |
+| `-f, --force` | Force overwrite without prompting |
+| `-l, --list` | List available templates |
+| `-h, --help` | Show help message |
 
 ### Examples
 
@@ -72,169 +78,178 @@ hammer starter my-project --dir ~/projects
 # With variables
 hammer starter my-app \
   -v author="Jane Smith" \
-  -v license=Apache-2.0 \
-  -v description="My awesome app"
+  -v email="jane@example.com" \
+  -v license=Apache-2.0
+
+# Force overwrite
+hammer arty my-lib --force
 ```
 
-## Built-in Templates
+## 📚 Built-in Templates
 
-### arty.sh Template
+### 🎨 arty - Library Manager
 
-Generates a complete bash library repository management system.
+Complete bash library repository management system with dependency management.
 
 **Features:**
 - Git-based library installation
-- Dependency management with `arty.yml`
-- Setup hooks for library initialization
-- Curl-installable
-- Reference system for dependencies
+- YAML-based configuration
+- Dependency resolution
+- Setup hooks
+- Binary linking
 
-**Generated files:**
-- `arty.sh` - Main library manager script
-- `arty.yml` - Project configuration file
-- `README.md` - Documentation
-- `.gitignore` - Git ignore file
-- `setup.sh` - Setup hook
-- `LICENSE` - MIT license
-
-**Usage:**
 ```bash
 hammer arty my-lib-manager
 cd my-lib-manager
-chmod +x arty.sh
 ./arty.sh --help
 ```
 
-### Starter Template
+### 🌱 starter - Project Skeleton
 
-Generates a basic bash project skeleton with arty.sh integration.
+Basic bash project skeleton with arty.sh integration.
 
 **Features:**
-- Ready-to-use project structure
-- arty.yml configuration
-- Example index.sh with logging utilities
-- Git-ready with .gitignore
+- Project structure
+- Logging utilities
+- Configuration support
+- Git-ready
 
-**Generated files:**
-- `arty.yml` - Project configuration
-- `index.sh` - Main entry point
-- `README.md` - Documentation
-- `.gitignore` - Git ignore file
-
-**Usage:**
 ```bash
 hammer starter my-project
 cd my-project
-chmod +x index.sh
 ./index.sh
 ```
 
-### leaf Template
+### 🍃 leaf - Documentation Generator
 
-Generates a beautiful static documentation site generator for arty.sh projects.
+Beautiful static HTML documentation generator for arty.sh projects.
 
 **Features:**
-- Modern, responsive design with Tailwind CSS v4
-- Automatic parsing of arty.yml, README.md, and project files
-- Syntax highlighting with Highlight.js
-- Dark/light theme toggle with localStorage persistence
-- Source file and examples display
-- Project icon integration
-- Mobile-friendly layout
-- Single-file HTML output
+- Responsive design with Tailwind CSS
+- Syntax highlighting
+- Dark/light theme
+- Auto-parsing of project files
+- Landing page generation
 
-**Generated files:**
-- `leaf.sh` - Main documentation generator script
-- `arty.yml` - Project configuration
-- `README.md` - Documentation for the generator
-- `.gitignore` - Git ignore file
-- `LICENSE` - MIT license
-
-**Usage:**
 ```bash
 hammer leaf my-docs-generator
 cd my-docs-generator
-chmod +x leaf.sh
-
-# Generate docs for any arty.sh project
-./leaf.sh /path/to/your/arty-project
-
-# Or generate docs for current directory
-./leaf.sh
-
-# Open the generated documentation
-open docs/index.html
+./leaf.sh /path/to/project
 ```
 
-**Example Output:**
-The generator creates a beautiful single-page documentation site with:
-- Hero section with project icon and metadata
-- Overview section from README.md
-- Source files with syntax-highlighted code
-- Examples section with all example files
-- Smooth scrolling navigation
-- Interactive dark/light theme switcher
+### 🚀 init - Project Initializer (NEW!)
 
-**Perfect for:**
-- Creating project documentation websites
-- Showcasing bash libraries
-- Generating API documentation
-- Building developer guides
-- Sharing code examples
+Comprehensive project initialization system with templates and testing framework.
 
-## Template Variables
+**Features:**
+- Multiple templates (basic, cli, lib, web)
+- Interactive mode with prompts
+- Git integration
+- Built-in test framework
+- Auto-dependency installation
+- Beautiful CLI with emojis
+
+```bash
+hammer init project-init-tool
+cd project-init-tool
+./init.sh --interactive
+
+# Or direct usage
+./init.sh my-new-project --template cli
+```
+
+**What it generates:**
+- Complete project structure
+- Test framework with assertions
+- README with examples
+- Git initialization
+- arty.yml configuration
+- LICENSE file
+
+### 🎯 judge - Testing Framework
+
+Bash testing framework with rich assertions and beautiful output.
+
+**Features:**
+- Assertion library
+- Snapshot testing
+- Colorful output
+- CI/CD ready
+
+```bash
+hammer judge test-framework
+cd test-framework
+./judge.sh test examples/basic_test.sh
+```
+
+### 🎨 icony - Icon Manager
+
+SVG icon management system for bash projects.
+
+**Features:**
+- Icon organization
+- SVG optimization
+- Asset management
+
+```bash
+hammer icony my-icon-manager
+cd my-icon-manager
+./icony.sh --help
+```
+
+## 🎯 Template Variables
 
 Templates support variable substitution using `{{variable}}` syntax:
 
 ### Built-in Variables
 
-- `{{project_name}}` - Name of the project
-- `{{year}}` - Current year
-- `{{date}}` - Current date (YYYY-MM-DD)
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `{{project_name}}` | Project name | my-project |
+| `{{year}}` | Current year | 2025 |
+| `{{date}}` | Current date | 2025-10-17 |
 
 ### Custom Variables
 
-Pass custom variables using the `-v` flag:
+Pass custom variables with `-v`:
 
 ```bash
 hammer starter my-app \
   -v author="Your Name" \
   -v email="you@example.com" \
-  -v license=MIT
+  -v license=MIT \
+  -v description="My awesome project"
 ```
 
-In your template files, use:
-```
-Author: {{author}}
-Email: {{email}}
-License: {{license}}
+In templates:
+```bash
+# Author: {{author}}
+# Email: {{email}}
+# License: {{license}}
 ```
 
-## Creating Custom Templates
+## 🛠️ Creating Custom Templates
 
 ### Template Structure
 
 ```
 templates/
 └── mytemplate/
-    ├── .template          # Template metadata
-    ├── README.md          # Files to be generated
+    ├── .template          # Metadata
+    ├── README.md          
     ├── main.sh
     └── config.yml
 ```
 
-### Template Metadata
-
-Create a `.template` file:
+### Metadata File (.template)
 
 ```bash
 description="My custom template"
 version="1.0.0"
+organization_name="my-org"
 ```
 
-### Using Variables in Templates
-
-Use `{{variable}}` syntax in any file:
+### Using Variables
 
 ```bash
 #!/usr/bin/env bash
@@ -244,19 +259,19 @@ Use `{{variable}}` syntax in any file:
 echo "Hello from {{project_name}}!"
 ```
 
-### Example Custom Template
+### Example: Web App Template
 
 ```bash
 # Create template directory
 mkdir -p templates/webapp
 
-# Create template metadata
-cat > templates/webapp/.template << EOF
+# Metadata
+cat > templates/webapp/.template << 'EOF'
 description="A web application template"
 version="1.0.0"
 EOF
 
-# Create template files
+# Template files
 cat > templates/webapp/server.sh << 'EOF'
 #!/usr/bin/env bash
 # {{project_name}} Server
@@ -265,183 +280,498 @@ echo "Starting {{project_name}}..."
 python3 -m http.server 8080
 EOF
 
-# Use your template
+chmod +x templates/webapp/server.sh
+
+# Use it
 hammer webapp my-webapp
 ```
 
-## Integration with arty.sh
-
-hammer.sh templates can generate arty.sh-compatible projects:
-
-```yaml
-# arty.yml in generated project
-name: "{{project_name}}"
-version: "0.1.0"
-description: "Generated by hammer.sh"
-
-references:
-  - https://github.com/user/some-library.git
-
-main: "index.sh"
-```
-
-Install dependencies after generation:
-
-```bash
-hammer starter my-project
-cd my-project
-arty deps  # Install references from arty.yml
-```
-
-## Project Examples
-
-### judge.sh - Testing Framework
-
-A complete bash testing framework created with arty.sh:
-
-```bash
-cd judge.sh
-./judge.sh test examples/basic_test.sh
-```
-
-Features:
-- Rich assertion library
-- Colorful output
-- Test discovery
-- Verbose mode
-- CI/CD integration
-
-See `judge.sh/` directory for full implementation.
-
-## Directory Structure
-
-```
-hammer.sh/
-├── hammer.sh                 # Main CLI tool
-├── templates/                # Template directory
-│   ├── arty/                 # arty.sh template
-│   │   ├── .template
-│   │   ├── arty.sh
-│   │   ├── arty.yml
-│   │   ├── README.md
-│   │   ├── .gitignore
-│   │   ├── setup.sh
-│   │   └── LICENSE
-│   ├── starter/              # Starter template
-│   │   ├── .template
-│   │   ├── arty.yml
-│   │   ├── index.sh
-│   │   ├── README.md
-│   │   └── .gitignore
-│   └── leaf/           # Documentation generator
-│       ├── .template
-│       ├── leaf.sh
-│       ├── arty.yml
-│       ├── README.md
-│       ├── .gitignore
-│       └── LICENSE
-└── README.md
-
-judge.sh/                     # Example project
-├── judge.sh                  # Testing framework
-├── arty.yml                  # Configuration
-├── examples/
-│   └── basic_test.sh
-├── README.md
-├── .gitignore
-└── LICENSE
-```
-
-## Advanced Usage
+## 🔧 Advanced Features
 
 ### Batch Generation
 
-Generate multiple projects:
-
 ```bash
+# Generate multiple projects
 for name in lib1 lib2 lib3; do
   hammer starter "$name" --dir ./projects
 done
 ```
 
-### Template Development
+### Smart Overwrite Handling
 
-1. Create template directory in `templates/`
-2. Add `.template` metadata file
-3. Create template files with `{{variables}}`
-4. Test with `hammer <template> test-project`
+When files exist, hammer.sh prompts:
+- `y` - Overwrite this file
+- `n` - Skip this file
+- `a` - Overwrite all remaining
+- `N` - Skip all remaining
 
-### Variable Validation
+Or use `--force` to overwrite all without prompting.
 
-Templates can include validation logic in setup scripts:
+### Integration with arty.sh
 
-```bash
-#!/usr/bin/env bash
-# setup.sh
+Generated projects work seamlessly with arty:
 
-if [[ -z "{{author}}" ]]; then
-  echo "Error: author variable required"
-  exit 1
-fi
-
-echo "Setting up {{project_name}} by {{author}}"
+```yaml
+# arty.yml
+name: "my-project"
+version: "0.1.0"
+references:
+  - https://github.com/user/dependency.git
+main: "index.sh"
 ```
 
-## Tips and Best Practices
+Install dependencies:
+```bash
+cd my-project
+arty deps
+```
 
-1. **Use descriptive template names** - Make it clear what each template generates
-2. **Include good defaults** - Templates should work with minimal configuration
-3. **Document variables** - List required and optional variables in README
-4. **Test templates** - Generate and test projects before committing templates
-5. **Version templates** - Use .template version field to track changes
-6. **Keep it simple** - Templates should be easy to understand and modify
+## 💡 Bash One-Liners & Aliases
 
-## Troubleshooting
+### Hammer Shortcuts
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+
+# Basic hammer aliases
+alias h='hammer'
+alias hl='hammer --list'
+alias ha='hammer arty'
+alias hs='hammer starter'
+alias hi='hammer init'
+alias hj='hammer judge'
+alias hlf='hammer leaf'
+
+# Quick project creation and enter
+hcd() { hammer "$1" "$2" && cd "$2"; }
+# Example: hcd starter my-app
+
+# Generate with timestamp
+htime() { hammer "$1" "$2-$(date +%Y%m%d-%H%M%S)"; }
+# Example: htime starter quick-test
+
+# Generate with author from git
+hme() {
+  local author=$(git config user.name)
+  local email=$(git config user.email)
+  hammer "$1" "$2" -v author="$author" -v email="$email"
+}
+# Example: hme starter my-project
+```
+
+### Advanced Aliases
+
+```bash
+# Generate with full setup (git + deps)
+hfull() {
+  hammer "$1" "$2" &&
+  cd "$2" &&
+  git init &&
+  git add . &&
+  git commit -m "🔨 Generated with hammer.sh" &&
+  command -v arty >/dev/null && arty deps &&
+  echo "✅ Project ready: $(pwd)"
+}
+
+# Generate and open in editor
+hedit() {
+  hammer "$1" "$2" && code "$2"  # or vim, nano, etc.
+}
+
+# Generate multiple from list
+hmulti() { 
+  while read -r name; do 
+    [[ -n "$name" ]] && hammer starter "$name" --dir ./batch
+  done
+}
+# Usage: echo -e "proj1\nproj2\nproj3" | hmulti
+
+# Backup before regenerate
+hbackup() {
+  local proj="$2"
+  [[ -d "$proj" ]] && cp -r "$proj" "${proj}.backup.$(date +%s)"
+  hammer "$1" "$2" --force
+}
+
+# Quick test generation (temporary)
+htest() { 
+  hammer "$1" "test-$1-$$" --dir /tmp
+  cd "/tmp/test-$1-$$"
+}
+
+# Clean test projects
+hclean() {
+  find . -maxdepth 1 -type d -name "test-*" -exec rm -rf {} +
+}
+
+# Generate and show tree
+htree() {
+  hammer "$1" "$2" && tree "$2" -L 3 -a
+}
+
+# Interactive template selector (requires fzf)
+hselect() {
+  local template=$(hammer --list | grep '^\s\+' | awk '{print $1}' | fzf --prompt="Select template: ")
+  if [[ -n "$template" ]]; then
+    read -p "Project name: " name
+    [[ -n "$name" ]] && hammer "$template" "$name"
+  fi
+}
+
+# Generate project matrix (all templates)
+hmatrix() {
+  for template in arty starter leaf init judge icony; do
+    hammer "$template" "demo-${template}" --dir ./demo-projects
+  done
+}
+```
+
+### Creative One-Liners
+
+```bash
+# Find and count all bash files in templates
+alias hcount='find templates -name "*.sh" | wc -l'
+
+# Show template statistics
+alias hstats='for t in templates/*/; do echo "$(basename $t): $(find $t -type f | wc -l) files"; done'
+
+# Search in templates
+hsearch() { grep -r "$1" templates/ --include="*.sh" --color=always -n; }
+
+# List all template variables
+hvars() { grep -roh '{{[^}]*}}' "templates/$1" | sort -u; }
+
+# Validate template syntax
+hvalidate() {
+  find "templates/$1" -name "*.sh" -exec bash -n {} \; 2>&1 | grep -v "No such file"
+}
+
+# Compare two templates
+hcompare() {
+  diff -r "templates/$1" "templates/$2" --color=always
+}
+
+# Generate from template file (CSV)
+hfrom() {
+  while IFS=, read -r template name; do
+    [[ -n "$name" ]] && hammer "$template" "$name"
+  done < "$1"
+}
+# Usage: Create projects.csv with: template,name
+
+# Watch template directory and regenerate
+hwatch() {
+  while inotifywait -q -r templates/"$1" -e modify; do
+    echo "🔄 Template changed, regenerating..."
+    hammer "$1" "$2" --force
+  done
+}
+
+# Generate with custom license
+hlicense() {
+  hammer "$1" "$2" -v license="$3"
+  [[ -f "$2/LICENSE" ]] && cat > "$2/LICENSE" << EOF
+$3 License
+
+Copyright (c) $(date +%Y) $(git config user.name)
+...
+EOF
+}
+
+# Parallel generation (requires GNU parallel)
+hparallel() {
+  echo "$@" | tr ' ' '\n' | parallel -j4 "hammer starter {}"
+}
+
+# Generate and initialize with git flow
+hflow() {
+  hammer "$1" "$2" && cd "$2" &&
+  git init &&
+  git checkout -b develop &&
+  git add . &&
+  git commit -m "Initial commit" &&
+  git checkout -b main &&
+  git merge develop
+}
+
+# Generate with version
+hver() {
+  hammer "$1" "$2" -v version="$3"
+}
+
+# Create project with README template
+hreadme() {
+  hammer "$1" "$2" &&
+  cat > "$2/README.md" << EOF
+# $2
+
+> Generated with hammer.sh at $(date)
+
+## Description
+
+Add your description here.
+
+## Installation
+
+\`\`\`bash
+git clone https://github.com/yourusername/$2.git
+\`\`\`
+
+## Usage
+
+\`\`\`bash
+./$2.sh
+\`\`\`
+EOF
+}
+```
+
+### Project Management Aliases
+
+```bash
+# List all generated projects
+alias hprojects='find . -maxdepth 2 -name "arty.yml" -exec dirname {} \;'
+
+# Update all projects
+hupdate() {
+  find . -maxdepth 2 -name "arty.yml" -exec dirname {} \; | while read dir; do
+    echo "Updating $dir..."
+    (cd "$dir" && git pull && arty deps)
+  done
+}
+
+# Archive old projects
+harchive() {
+  local archive_dir="$HOME/hammer-archive/$(date +%Y-%m)"
+  mkdir -p "$archive_dir"
+  mv "$1" "$archive_dir/"
+}
+
+# Generate project with tags
+htag() {
+  hammer "$1" "$2" &&
+  cd "$2" &&
+  git init &&
+  git add . &&
+  git commit -m "Initial commit" &&
+  git tag -a "v0.1.0" -m "Initial release"
+}
+
+# Show project info
+hinfo() {
+  [[ -f "$1/arty.yml" ]] && {
+    echo "Name: $(yq eval '.name' $1/arty.yml)"
+    echo "Version: $(yq eval '.version' $1/arty.yml)"
+    echo "Description: $(yq eval '.description' $1/arty.yml)"
+  }
+}
+```
+
+### Integration Aliases
+
+```bash
+# Generate and deploy to GitHub
+hgithub() {
+  hammer "$1" "$2" &&
+  cd "$2" &&
+  git init &&
+  git add . &&
+  git commit -m "🔨 Generated with hammer.sh" &&
+  gh repo create "$2" --public --source=. --push
+}
+
+# Generate and create Docker setup
+hdocker() {
+  hammer "$1" "$2" &&
+  cat > "$2/Dockerfile" << 'EOF'
+FROM bash:latest
+COPY . /app
+WORKDIR /app
+CMD ["bash", "index.sh"]
+EOF
+}
+
+# Generate with CI/CD
+hci() {
+  hammer "$1" "$2" &&
+  mkdir -p "$2/.github/workflows" &&
+  cat > "$2/.github/workflows/test.yml" << 'EOF'
+name: Test
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: bash tests/run-tests.sh
+EOF
+}
+```
+
+## 📊 Comparison with Other Tools
+
+| Feature | hammer.sh | Yeoman | Cookiecutter |
+|---------|-----------|---------|--------------|
+| Language | Bash | JavaScript | Python |
+| Templates | 6+ built-in | npm packages | Git repos |
+| Size | <10KB | >100MB | >50MB |
+| Speed | ⚡ Fast | 🐌 Slow | 🐇 Medium |
+| Dependencies | None | Node.js | Python |
+| Bash-native | ✅ Yes | ❌ No | ❌ No |
+| arty.sh Integration | ✅ Yes | ❌ No | ❌ No |
+| Overwrite Control | ✅ Interactive | ⚠️ Basic | ⚠️ Basic |
+
+## 🏗️ Development
+
+### Requirements
+
+- bash 4.0+
+- git (optional, for templates)
+
+### Setup
+
+```bash
+git clone https://github.com/butter-sh/hammer.sh.git
+cd hammer.sh
+chmod +x hammer.sh
+./hammer.sh --help
+```
+
+### Testing
+
+```bash
+# Run test script
+./test.sh
+
+# Generate test projects
+./hammer.sh starter test-proj
+./hammer.sh arty test-arty
+./hammer.sh init test-init
+```
+
+## 📁 Directory Structure
+
+```
+hammer.sh/
+├── hammer.sh              # Main CLI
+├── README.md              # This file
+├── LICENSE                # MIT license
+├── QUICKSTART.md          # Quick start guide
+├── test.sh                # Test script
+├── examples/              # Usage examples
+│   ├── usage.sh
+│   └── leaf-usage.sh
+├── templates/             # Template library
+│   ├── arty/              # Library manager
+│   ├── starter/           # Project skeleton
+│   ├── leaf/              # Docs generator
+│   ├── init/              # Project initializer (NEW!)
+│   ├── judge/             # Test framework
+│   └── icony/             # Icon manager
+└── .github/
+    └── workflows/
+        └── hammer.docs.yml
+```
+
+## 🤝 Contributing
+
+Contributions welcome! Areas for improvement:
+
+- New templates
+- Better variable handling
+- Template validation
+- Documentation improvements
+- Bug fixes
+
+### Adding a Template
+
+1. Create directory: `templates/mytemplate/`
+2. Add `.template` metadata
+3. Create template files with `{{variables}}`
+4. Test: `hammer mytemplate test-project`
+5. Submit PR!
+
+## 📄 License
+
+MIT License - see LICENSE file
+
+## 🔗 Related Projects
+
+Part of the **butter.sh** ecosystem:
+
+- [**arty.sh**](https://github.com/butter-sh/arty.sh) - Library manager
+- [**leaf.sh**](https://github.com/butter-sh/leaf.sh) - Documentation generator
+- [**init.sh**](https://github.com/butter-sh/init.sh) - Project initializer (NEW!)
+- [**judge.sh**](https://github.com/butter-sh/judge.sh) - Testing framework
+- [**icony.sh**](https://github.com/butter-sh/icony.sh) - Icon manager
+
+## 🎓 Resources
+
+- [Documentation](https://hammer.sh/docs)
+- [Templates Guide](https://hammer.sh/templates)
+- [API Reference](https://hammer.sh/api)
+- [Examples](./examples/)
+
+## 🆘 Troubleshooting
 
 ### Template not found
 ```bash
-# List available templates
-hammer --list
-
-# Check templates directory
-ls -la templates/
+hammer --list  # Check available templates
+ls -la templates/  # Verify template exists
 ```
 
 ### Variables not replaced
-- Ensure you're using `{{variable}}` syntax (not `${variable}`)
-- Check that variable names match exactly
-- Use `-v` flag to pass custom variables
-
-### Permission issues
 ```bash
-# Make generated scripts executable
-chmod +x generated-project/*.sh
-
-# Or in template, mark files as executable
-chmod +x templates/mytemplate/script.sh
+# Use correct syntax: {{variable}} not ${variable}
+# Check variable names match exactly
+# Use -v flag for custom variables
 ```
 
-## Contributing
+### Permission denied
+```bash
+chmod +x hammer.sh
+chmod +x templates/*/setup.sh
+```
 
-Contributions are welcome! Please feel free to submit:
-- New templates
-- Bug fixes
-- Feature improvements
-- Documentation updates
+## 🌟 Examples
 
-## License
+### Create CLI Tool
 
-MIT License - see LICENSE file for details
+```bash
+hammer init my-cli
+cd my-cli
+./init.sh awesome-cli --template cli
+cd awesome-cli
+arty start
+```
 
-## Related Projects
+### Create Library with Documentation
 
-- **arty.sh** - Bash library repository manager (template included)
-- **judge.sh** - Bash testing framework (example project)
+```bash
+hammer arty my-awesome-lib
+cd my-awesome-lib
+# Add your library code
+hammer leaf my-lib-docs
+cd my-lib-docs
+./leaf.sh ../
+open docs/index.html
+```
 
-## Credits
+### Full Project Setup
 
-Created to make bash project scaffolding fast and easy!
+```bash
+# Generate, initialize git, install deps
+hammer starter my-project
+cd my-project
+git init
+git add .
+git commit -m "Initial commit"
+arty deps
+arty start
+```
 
 ---
 
-Happy hammering! 🔨
+**Made with ❤️ by the butter.sh team**
+
+Happy hammering! 🔨✨

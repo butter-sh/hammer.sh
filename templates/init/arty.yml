@@ -1,0 +1,28 @@
+name: "{{project_name}}"
+version: "1.0.0"
+description: "A comprehensive arty.sh project initialization system"
+author: ""
+license: "MIT"
+
+# Project type
+type: "tool"
+
+# Dependencies
+references:
+  # Example dependencies for generated projects
+  # - https://github.com/butter-sh/arty.sh.git
+
+# Entry point script
+main: "init.sh"
+
+# Available commands
+scripts:
+  init: "bash init.sh"
+  test: "bash init.sh test-project --skip-git --skip-deps"
+  demo: "bash init.sh demo-project --template cli"
+  help: "bash init.sh --help"
+
+# Environment
+env:
+  INIT_VERSION: "1.0.0"
+  DEBUG: "0"

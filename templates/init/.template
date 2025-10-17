@@ -1,0 +1,4 @@
+description="A comprehensive arty.sh project initialization system"
+version="1.0.0"
+organization_name="butter-sh"
+demo_project_name="{{project_name}}"

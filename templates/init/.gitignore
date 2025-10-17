@@ -1,0 +1,36 @@
+# arty.sh
+.arty/
+
+# Build artifacts
+dist/
+build/
+*.tar.gz
+*.zip
+
+# Test artifacts
+test-project/
+demo-project/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+
+# Temporary
+tmp/
+temp/
+*.tmp
