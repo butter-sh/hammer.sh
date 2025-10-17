@@ -4,13 +4,12 @@ description: "A comprehensive arty.sh project initialization system"
 author: ""
 license: "MIT"
 
+references:
+- https://github.com/butter-sh/leaf.sh.git
+- https://github.com/butter-sh/judge.sh.git
+
 # Project type
 type: "tool"
-
-# Dependencies
-references:
-  # Example dependencies for generated projects
-  # - https://github.com/butter-sh/arty.sh.git
 
 # Entry point script
 main: "init.sh"

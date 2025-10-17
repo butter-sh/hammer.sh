@@ -4,9 +4,9 @@ description: "SVG to icon set generator using CSS mask-image"
 author: ""
 license: "MIT"
 
-# Dependencies from other arty.sh repositories
 references:
-  # Add any dependencies here
+- https://github.com/butter-sh/leaf.sh.git
+- https://github.com/butter-sh/judge.sh.git
 
 # Entry point script
 main: "icony.sh"

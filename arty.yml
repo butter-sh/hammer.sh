@@ -1,0 +1,11 @@
+name: "hammer.sh"
+version: "1.0.0"
+description: "A bash  project generator"
+author: "valknar@pivoine.art"
+license: "MIT"
+
+main: hammer.sh
+
+references:
+- https://github.com/butter-sh/leaf.sh.git
+- https://github.com/butter-sh/judge.sh.git
