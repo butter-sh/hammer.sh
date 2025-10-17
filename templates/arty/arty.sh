@@ -6,8 +6,9 @@
 set -euo pipefail
 
 # Configuration
-ARTY_HOME="${ARTY_HOME:-$HOME/.arty}"
+ARTY_HOME="${ARTY_HOME:-$PWD/.arty}"
 ARTY_LIBS_DIR="$ARTY_HOME/libs"
+ARTY_BIN_DIR="$ARTY_HOME/bin"
 ARTY_CONFIG_FILE="${ARTY_CONFIG_FILE:-arty.yml}"
 
 # Colors
@@ -48,6 +49,7 @@ check_yq() {
 init_arty() {
     if [[ ! -d "$ARTY_HOME" ]]; then
         mkdir -p "$ARTY_LIBS_DIR"
+				mkdir -p "$ARTY_BIN_DIR"
         log_success "Initialized arty at $ARTY_HOME"
     fi
 }
@@ -144,15 +146,14 @@ install_lib() {
         if [[ -n "$main_script" ]] && [[ "$main_script" != "null" ]]; then
             local main_file="$lib_dir/$main_script"
             if [[ -f "$main_file" ]]; then
-                local local_bin_dir=".arty/bin"
-                mkdir -p "$local_bin_dir"
-                local $lib_name_stripped="$(basename $lib_name .sh)"
+                local local_bin_dir="$ARTY_BIN_DIR"
+                local lib_name_stripped="$(basename $main_file .sh)"
                 local bin_link="$local_bin_dir/$lib_name_stripped"
                 
                 log_info "Linking main script: $main_script -> $bin_link"
-                ln -sf "../libs/$lib_name/$main_script" "$bin_link"
+                ln -sf "$main_file" "$bin_link"
                 chmod +x "$main_file"
-                log_success "Main script linked to .arty/bin/$lib_name_stripped"
+                log_success "Main script linked to $bin_link"
             fi
         fi
         
@@ -292,10 +293,11 @@ exec_lib() {
     local lib_name="$1"
     shift  # Remove lib_name from arguments, rest are passed to the script
     
-    local bin_path=".arty/bin/$lib_name"
+		local lib_name_stripped="$(basename $lib_name .sh)"
+    local bin_path=".arty/bin/$lib_name_stripped"
     
     if [[ ! -f "$bin_path" ]]; then
-        log_error "Library executable not found: $lib_name"
+        log_error "Library executable not found: $lib_name_stripped"
         log_info "Make sure the library is installed with 'arty deps' or 'arty install'"
         log_info "Available executables:"
         if [[ -d ".arty/bin" ]]; then
@@ -437,9 +439,9 @@ main() {
     case "$command" in
         install)
             if [[ $# -eq 0 ]]; then
-                install_references
+              	install_references
 						else
-            	install_lib "$@"
+            		install_lib "$@"
             fi
             ;;
         deps)
