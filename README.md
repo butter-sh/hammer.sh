@@ -8,7 +8,7 @@ A powerful code generator that helps you quickly scaffold new bash projects from
 
 - 🔨 Generate projects from templates
 - 🎨 Variable substitution in templates
-- 📦 Built-in templates (arty, starter, leaf, init, judge, icony)
+- 📦 Built-in templates (arty, starter, leaf, init, judge, icony, whip)
 - 🔧 Fully configurable
 - 🚀 Easy to extend with custom templates
 - ⚡ Fast and lightweight
@@ -41,9 +41,10 @@ hammer --list
 hammer arty my-lib-manager        # Library manager
 hammer starter my-project         # Basic project
 hammer leaf my-docs-gen          # Documentation generator
-hammer init project-initializer   # Project scaffolder (NEW!)
+hammer init project-initializer   # Project scaffolder
 hammer icony my-icon-tool        # SVG icon manager
 hammer judge test-framework      # Testing framework
+hammer whip release-manager      # Release management (NEW!)
 
 # With options
 hammer starter my-app --dir ./projects
@@ -196,6 +197,37 @@ hammer icony my-icon-manager
 cd my-icon-manager
 ./icony.sh --help
 ```
+
+### 🎯 whip - Release Manager (NEW!)
+
+Complete release cycle management for arty.sh projects.
+
+**Features:**
+- Semantic versioning (major, minor, patch)
+- Changelog generation from git history
+- Git tag creation and pushing
+- Commit hooks with bash validation (shellcheck, bash -n)
+- Monorepo support with batch operations
+
+```bash
+hammer whip my-release-manager
+cd my-release-manager
+bash setup.sh
+
+# Initialize git and create first release
+git init
+git add .
+git commit -m "Initial commit"
+./whip.sh release patch
+```
+
+**What it generates:**
+- Complete release management tool (~600 lines)
+- Pre-commit hooks with validation
+- Changelog automation from git history
+- Monorepo batch operations support
+- Full arty.yml integration
+- Version management with yq
 
 ## 🎯 Template Variables
 
@@ -420,7 +452,7 @@ hselect() {
 
 # Generate project matrix (all templates)
 hmatrix() {
-  for template in arty starter leaf init judge icony; do
+  for template in arty starter leaf init judge icony whip; do
     hammer "$template" "demo-${template}" --dir ./demo-projects
   done
 }
@@ -701,9 +733,10 @@ Part of the **butter.sh** ecosystem:
 
 - [**arty.sh**](https://github.com/butter-sh/arty.sh) - Library manager
 - [**leaf.sh**](https://github.com/butter-sh/leaf.sh) - Documentation generator
-- [**init.sh**](https://github.com/butter-sh/init.sh) - Project initializer (NEW!)
+- [**init.sh**](https://github.com/butter-sh/init.sh) - Project initializer
 - [**judge.sh**](https://github.com/butter-sh/judge.sh) - Testing framework
 - [**icony.sh**](https://github.com/butter-sh/icony.sh) - Icon manager
+- [**whip.sh**](https://github.com/butter-sh/whip.sh) - Release manager (NEW!)
 
 ## 🎓 Resources
 
