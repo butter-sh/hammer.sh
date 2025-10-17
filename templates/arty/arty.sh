@@ -34,6 +34,16 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1" >&2
 }
 
+# Check if yq is installed
+check_yq() {
+    if ! command -v yq &> /dev/null; then
+        log_error "yq is not installed. Please install yq to use arty."
+        log_info "Visit https://github.com/mikefarah/yq for installation instructions"
+        log_info "Quick install: brew install yq (macOS) or see README.md"
+        exit 1
+    fi
+}
+
 # Initialize arty environment
 init_arty() {
     if [[ ! -d "$ARTY_HOME" ]]; then
@@ -42,35 +52,51 @@ init_arty() {
     fi
 }
 
-# Parse YAML (simple implementation for arty.yml)
-parse_yaml() {
+# Get a field from YAML using yq
+get_yaml_field() {
     local file="$1"
-    local prefix="${2:-}"
+    local field="$2"
     
     if [[ ! -f "$file" ]]; then
         return 1
     fi
     
-    local s='[[:space:]]*'
-    local w='[a-zA-Z0-9_-]*'
-    
-    sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\2=\"\3\"|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\2=\"\3\"|p" "$file" |
-    sed -e "s/^/${prefix}/" \
-        -e 's/_/-/g'
+    yq eval ".$field" "$file" 2>/dev/null || echo ""
 }
 
-# Read arty.yml configuration
-read_config() {
-    local config_file="${1:-$ARTY_CONFIG_FILE}"
+# Get array items from YAML using yq
+get_yaml_array() {
+    local file="$1"
+    local field="$2"
     
-    if [[ ! -f "$config_file" ]]; then
-        log_error "Config file not found: $config_file"
+    if [[ ! -f "$file" ]]; then
         return 1
     fi
     
-    # Parse basic fields
-    eval "$(parse_yaml "$config_file")"
+    yq eval ".${field}[]" "$file" 2>/dev/null
+}
+
+# Get script command from YAML
+get_yaml_script() {
+    local file="$1"
+    local script_name="$2"
+    
+    if [[ ! -f "$file" ]]; then
+        return 1
+    fi
+    
+    yq eval ".scripts.${script_name}" "$file" 2>/dev/null || echo "null"
+}
+
+# List all script names from YAML
+list_yaml_scripts() {
+    local file="$1"
+    
+    if [[ ! -f "$file" ]]; then
+        return 1
+    fi
+    
+    yq eval '.scripts | keys | .[]' "$file" 2>/dev/null
 }
 
 # Get library name from repository URL
@@ -112,8 +138,24 @@ install_lib() {
         }
     fi
     
-    # Check for arty.yml and install references
+    # Link main script to .arty/bin if arty.yml has a main field
     if [[ -f "$lib_dir/arty.yml" ]]; then
+        local main_script=$(get_yaml_field "$lib_dir/arty.yml" "main")
+        if [[ -n "$main_script" ]] && [[ "$main_script" != "null" ]]; then
+            local main_file="$lib_dir/$main_script"
+            if [[ -f "$main_file" ]]; then
+                local local_bin_dir=".arty/bin"
+                mkdir -p "$local_bin_dir"
+                local bin_link="$local_bin_dir/$lib_name"
+                
+                log_info "Linking main script: $main_script -> $bin_link"
+                ln -sf "../libs/$lib_name/$main_script" "$bin_link"
+                chmod +x "$main_file"
+                log_success "Main script linked to .arty/bin/$lib_name"
+            fi
+        fi
+        
+        # Install references from the library's arty.yml
         log_info "Found arty.yml, checking for references..."
         install_references "$lib_dir/arty.yml"
     fi
@@ -124,35 +166,6 @@ install_lib() {
 
 # Install all references from arty.yml
 install_references() {
-    local config_file="$1"
-    local in_references=false
-    local line_num=0
-    
-    while IFS= read -r line; do
-        line_num=$((line_num+1))
-        
-        # Check if we're entering references section
-        if [[ "$line" =~ ^references:[[:space:]]*$ ]]; then
-            in_references=true
-            continue
-        fi
-        
-        # Check if we're leaving references section
-        if [[ "$in_references" == true ]] && [[ "$line" =~ ^[a-zA-Z] ]]; then
-            in_references=false
-        fi
-        
-        # Parse reference entries
-        if [[ "$in_references" == true ]] && [[ "$line" =~ ^[[:space:]]+-[[:space:]]+(.+)$ ]]; then
-            local ref="${BASH_REMATCH[1]}"
-            log_info "Installing reference: $ref"
-            install_lib "$ref" || log_warn "Failed to install reference: $ref"
-        fi
-    done < "$config_file"
-}
-
-# Install dependencies from local arty.yml
-install_deps() {
     local config_file="${1:-$ARTY_CONFIG_FILE}"
     
     if [[ ! -f "$config_file" ]]; then
@@ -160,83 +173,13 @@ install_deps() {
         return 1
     fi
     
-    # Create local .arty folder structure
-    local local_arty_dir=".arty"
-    local local_bin_dir="$local_arty_dir/bin"
-    local local_libs_dir="$local_arty_dir/libs"
-    
-    log_info "Creating local arty structure"
-    mkdir -p "$local_bin_dir" "$local_libs_dir"
-    
-    log_info "Installing dependencies from $config_file"
-    
-    # Install references into local .arty/libs/<DEPENDENCY_NAME>
-    local in_references=false
-    local line_num=0
-    
-    while IFS= read -r line; do
-        line_num=$((line_num+1))
-        
-        # Check if we're entering references section
-        if [[ "$line" =~ ^references:[[:space:]]*$ ]]; then
-            in_references=true
-            continue
+    # Get all references using yq
+    while IFS= read -r ref; do
+        if [[ -n "$ref" ]] && [[ "$ref" != "null" ]]; then
+            log_info "Installing reference: $ref"
+            install_lib "$ref" || log_warn "Failed to install reference: $ref"
         fi
-        
-        # Check if we're leaving references section
-        if [[ "$in_references" == true ]] && [[ "$line" =~ ^[a-zA-Z] ]]; then
-            in_references=false
-        fi
-        
-        # Parse reference entries
-        if [[ "$in_references" == true ]] && [[ "$line" =~ ^[[:space:]]+-[[:space:]]+(.+)$ ]]; then
-            local ref="${BASH_REMATCH[1]}"
-            local dep_name=$(get_lib_name "$ref")
-            local dep_dir="$local_libs_dir/$dep_name"
-            
-            log_info "Installing dependency: $dep_name"
-            
-            # Clone or update dependency
-            if [[ -d "$dep_dir" ]]; then
-                log_info "Dependency already exists, updating..."
-                (cd "$dep_dir" && git pull) || {
-                    log_error "Failed to update dependency: $dep_name"
-                    continue
-                }
-            else
-                git clone "$ref" "$dep_dir" || {
-                    log_error "Failed to clone dependency: $dep_name"
-                    continue
-                }
-            fi
-            
-            # Run setup hook if exists
-            if [[ -f "$dep_dir/setup.sh" ]]; then
-                log_info "Running setup hook for $dep_name..."
-                (cd "$dep_dir" && bash setup.sh) || {
-                    log_warn "Setup hook failed for $dep_name, continuing anyway..."
-                }
-            fi
-            
-            log_success "Dependency '$dep_name' installed successfully"
-        fi
-    done < "$config_file"
-    
-    # Link main script to .arty/bin if defined
-    local main_script=$(grep "^main:" "$config_file" | cut -d':' -f2 | tr -d ' "')
-    if [[ -n "$main_script" ]] && [[ -f "$main_script" ]]; then
-        local main_name=$(basename "$main_script" .sh)
-        local bin_link="$local_bin_dir/$main_name"
-        
-        log_info "Linking main script: $main_script -> $bin_link"
-        ln -sf "../../$main_script" "$bin_link"
-        chmod +x "$main_script"
-        log_success "Main script linked and made executable"
-    elif [[ -n "$main_script" ]]; then
-        log_warn "Main script defined but not found: $main_script"
-    fi
-    
-    log_success "All dependencies installed"
+    done < <(get_yaml_array "$config_file" "references")
 }
 
 # List installed libraries
@@ -256,9 +199,12 @@ list_libs() {
             local lib_name=$(basename "$lib_dir")
             local version=""
             
-            # Try to get version from arty.yml
+            # Try to get version from arty.yml using yq
             if [[ -f "$lib_dir/arty.yml" ]]; then
-                version=$(grep "^version:" "$lib_dir/arty.yml" | cut -d':' -f2 | tr -d ' "')
+                version=$(get_yaml_field "$lib_dir/arty.yml" "version")
+                if [[ "$version" == "null" ]] || [[ -z "$version" ]]; then
+                    version=""
+                fi
             fi
             
             printf "  ${GREEN}%-20s${NC} %s\n" "$lib_name" "${version:-(unknown version)}"
@@ -340,6 +286,38 @@ source_lib() {
     source "$lib_path"
 }
 
+# Execute a library's main script
+exec_lib() {
+    local lib_name="$1"
+    shift  # Remove lib_name from arguments, rest are passed to the script
+    
+    local bin_path=".arty/bin/$lib_name"
+    
+    if [[ ! -f "$bin_path" ]]; then
+        log_error "Library executable not found: $lib_name"
+        log_info "Make sure the library is installed with 'arty deps' or 'arty install'"
+        log_info "Available executables:"
+        if [[ -d ".arty/bin" ]]; then
+            for exec_file in .arty/bin/*; do
+                if [[ -f "$exec_file" ]]; then
+                    echo "  - $(basename "$exec_file")"
+                fi
+            done
+        else
+            echo "  (none found - run 'arty deps' first)"
+        fi
+        return 1
+    fi
+    
+    if [[ ! -x "$bin_path" ]]; then
+        log_error "Library executable is not executable: $bin_path"
+        return 1
+    fi
+    
+    # Execute the library's main script with all passed arguments
+    "$bin_path" "$@"
+}
+
 # Show usage
 show_usage() {
     cat << 'EOF'
@@ -355,6 +333,7 @@ COMMANDS:
     remove <name>              Remove an installed library
     init [name]                Initialize a new arty.yml project
     source <name> [file]       Source a library (for use in scripts)
+    exec <lib-name> [args]     Execute a library's main script with arguments
     <script-name>              Execute a script defined in arty.yml
     help                       Show this help message
 
@@ -378,6 +357,10 @@ EXAMPLES:
     arty test
     arty build
 
+    # Execute a library's main script
+    arty exec leaf --help
+    arty exec mylib process file.txt
+
     # Source library in a script
     source <(arty source utils)
 
@@ -387,6 +370,9 @@ PROJECT STRUCTURE:
     project/
     ├── .arty/
     │   ├── bin/           # Linked executables (from 'main' field)
+    │   │   ├── index      # Project's main script
+    │   │   ├── leaf       # Dependency's main script
+    │   │   └── mylib      # Another dependency's main script
     │   └── libs/          # Dependencies (from 'references' field)
     │       ├── dep1/
     │       └── dep2/
@@ -415,48 +401,30 @@ exec_script() {
         return 1
     fi
     
-    # Parse scripts section
-    local in_scripts=false
-    local found_script=false
+    # Get script command using yq
+    local cmd=$(get_yaml_script "$config_file" "$script_name")
     
-    while IFS= read -r line; do
-        # Check if we're entering scripts section
-        if [[ "$line" =~ ^scripts:[[:space:]]*$ ]]; then
-            in_scripts=true
-            continue
-        fi
-        
-        # Check if we're leaving scripts section
-        if [[ "$in_scripts" == true ]] && [[ "$line" =~ ^[a-zA-Z] ]]; then
-            in_scripts=false
-        fi
-        
-        # Parse script entries
-        if [[ "$in_scripts" == true ]] && [[ "$line" =~ ^[[:space:]]+([a-zA-Z0-9_-]+):[[:space:]]*(.+)$ ]]; then
-            local name="${BASH_REMATCH[1]}"
-            local cmd="${BASH_REMATCH[2]}"
-            # Remove quotes if present
-            cmd=$(echo "$cmd" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/")
-            
-            if [[ "$name" == "$script_name" ]]; then
-                found_script=true
-                log_info "Executing script: $script_name"
-                eval "$cmd"
-                return $?
-            fi
-        fi
-    done < "$config_file"
-    
-    if [[ "$found_script" == false ]]; then
+    if [[ -z "$cmd" ]] || [[ "$cmd" == "null" ]]; then
         log_error "Script not found in arty.yml: $script_name"
         log_info "Available scripts:"
-        grep -A 100 "^scripts:" "$config_file" | grep "^  [a-zA-Z]" | sed 's/^  /  - /' | cut -d':' -f1
+        while IFS= read -r name; do
+            if [[ -n "$name" ]]; then
+                echo "  - $name"
+            fi
+        done < <(list_yaml_scripts "$config_file")
         return 1
     fi
+    
+    log_info "Executing script: $script_name"
+    eval "$cmd"
+    return $?
 }
 
 # Main function
 main() {
+    # Check for yq availability first
+    check_yq
+    
     if [[ $# -eq 0 ]]; then
         show_usage
         exit 0
@@ -468,13 +436,13 @@ main() {
     case "$command" in
         install)
             if [[ $# -eq 0 ]]; then
-                log_error "Repository URL required"
-                exit 1
+                install_references
+						else
+            	install_lib "$@"
             fi
-            install_lib "$@"
             ;;
         deps)
-            install_deps "$@"
+            install_references
             ;;
         list|ls)
             list_libs
@@ -488,6 +456,14 @@ main() {
             ;;
         init)
             init_project "$@"
+            ;;
+        exec)
+            if [[ $# -eq 0 ]]; then
+                log_error "Library name required"
+                log_info "Usage: arty exec <library-name> [arguments]"
+                exit 1
+            fi
+            exec_lib "$@"
             ;;
         source)
             if [[ $# -eq 0 ]]; then
