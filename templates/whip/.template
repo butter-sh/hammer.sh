@@ -1,0 +1,2 @@
+description="Release cycle management for arty.sh projects with semver, changelogs, hooks, and monorepo support"
+version="1.0.0"
