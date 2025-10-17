@@ -112,7 +112,7 @@ prompt_overwrite() {
     while true; do
         printf "${YELLOW}?${NC} File exists: %s\n" "$file"
         printf "  Overwrite? [y]es/[n]o/[a]ll/[N]one: "
-        read -r response </dev/tty
+        read -r response
         
         case "$response" in
             y|Y|yes|Yes|YES)
@@ -219,15 +219,14 @@ generate_project() {
                         should_write=false
                         ;;
                     ask)
-                        prompt_overwrite "$rel_path"
-                        local result=$?
-                        case $result in
+                        local last_result=$(prompt_overwrite "$rel_path")
+                        case $last_result in
                             0) # yes
                                 should_write=true
                                 ;;
                             1) # no
                                 should_write=false
-                                ;;
+																;;
                             2) # all
                                 should_write=true
                                 overwrite_mode="all"
