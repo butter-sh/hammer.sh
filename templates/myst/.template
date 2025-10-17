@@ -1,0 +1,2 @@
+description="State-of-the-art templating engine with mustache-style syntax supporting inheritance, partials, and multiple input formats"
+version="1.0.0"

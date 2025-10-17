@@ -13,7 +13,4 @@ main: "icony.sh"
 
 # Available commands/scripts
 scripts:
-  generate: "bash icony.sh generate"
-  serve: "bash icony.sh serve"
-  clean: "bash icony.sh clean"
-  init: "bash icony.sh init"
+  test: arty exec judge run

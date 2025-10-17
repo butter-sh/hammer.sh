@@ -1,0 +1,14 @@
+name: "{{project_name}}"
+version: "1.0.0"
+description: "A state-of-the-art bash templating engine with mustache-style syntax"
+author: ""
+license: "MIT"
+
+# Entry point script
+main: "myst.sh"
+
+# Available commands/scripts
+scripts:
+  render: "bash myst.sh render"
+  test: "bash test.sh"
+  example: "bash examples/demo.sh"

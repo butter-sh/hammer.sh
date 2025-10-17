@@ -1,0 +1,46 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq
+        
+    - name: Setup myst.sh
+      run: |
+        chmod +x myst.sh
+        chmod +x test.sh
+        chmod +x examples/demo.sh
+        
+    - name: Run tests
+      run: |
+        ./test.sh
+        
+    - name: Validate templates
+      run: |
+        ./myst.sh render examples/templates/simple.myst -v name=Test -v premium=true -v theme=dark
+        
+    - name: Generate example output
+      run: |
+        ./myst.sh render examples/templates/page.myst \
+          -l examples/templates/layout.myst \
+          -j examples/data.json \
+          -o example-output.html
+          
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: generated-examples
+        path: example-output.html
