@@ -7,6 +7,7 @@ license: "MIT"
 references:
 - https://github.com/butter-sh/leaf.sh.git
 - https://github.com/butter-sh/judge.sh.git
+- https://github.com/butter-sh/myst.sh.git
 
 # Entry point script
 main: "icony.sh"
