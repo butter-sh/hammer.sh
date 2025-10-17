@@ -1,3 +1,7 @@
+# arty.sh specific
+.arty/
+*.log
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -13,7 +17,3 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
-
-# Generated test projects
-test-*/
-example-*/

@@ -111,7 +111,8 @@ prompt_overwrite() {
     
     while true; do
         printf "${YELLOW}?${NC} File exists: %s\n" "$file"
-        read -p "  Overwrite? [y]es/[n]o/[a]ll/[N]one: " response </dev/tty
+        printf "  Overwrite? [y]es/[n]o/[a]ll/[N]one: "
+        read -r response </dev/tty
         
         case "$response" in
             y|Y|yes|Yes|YES)
@@ -125,6 +126,10 @@ prompt_overwrite() {
                 ;;
             N|none|None|NONE)
                 return 3
+                ;;
+            "")
+                # Empty response - treat as no
+                return 1
                 ;;
             *)
                 log_warn "Invalid response. Please enter y, n, a, or N."
@@ -214,7 +219,7 @@ generate_project() {
                         should_write=false
                         ;;
                     ask)
-												prompt_overwrite "$rel_path"
+                        prompt_overwrite "$rel_path"
                         local result=$?
                         case $result in
                             0) # yes
