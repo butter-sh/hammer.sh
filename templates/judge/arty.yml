@@ -1,0 +1,19 @@
+name: "{{project_name}}"
+version: "1.0.0"
+description: "A bash testing framework for running and asserting test cases"
+author: ""
+license: "MIT"
+
+# Dependencies
+references:
+  # Example: Add bash utility libraries here
+  # - https://github.com/username/bash-colors.git
+
+# Entry point
+main: "{{project_name}}"
+
+# Scripts
+scripts:
+  run: "bash {{project_name}} run"
+  setup: "bash {{project_name}} setup"
+  snap: "bash {{project_name}} snap"

@@ -1,0 +1,4 @@
+.git/
+*.log
+snapshots/*.log
+!snapshots/*_master.log
