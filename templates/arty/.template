@@ -1,2 +1,4 @@
 description="A bash library repository management system"
 version="1.0.0"
+organization_name="butter-sh"
+demo_project_name="kompose.sh"

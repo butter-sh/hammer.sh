@@ -48,6 +48,7 @@ TEMPLATES:
 OPTIONS:
     -d, --dir <path>        Target directory (default: current directory)
     -v, --vars <key=value>  Set template variables (can be repeated)
+    -f, --force             Force overwrite existing files without prompting
     -l, --list              List available templates
     -h, --help              Show this help message
 
@@ -55,6 +56,7 @@ EXAMPLES:
     hammer.sh arty my-lib-manager
     hammer.sh starter my-project --dir ./projects
     hammer.sh starter my-app -v author="John Doe" -v license=MIT
+    hammer.sh arty my-lib --force
 
 EOF
 }
@@ -101,12 +103,43 @@ replace_vars() {
     echo "$content"
 }
 
+# Prompt for overwrite decision
+# Returns: 0 for yes, 1 for no, 2 for all, 3 for none
+prompt_overwrite() {
+    local file="$1"
+    local response
+    
+    while true; do
+        printf "${YELLOW}?${NC} File exists: %s\n" "$file"
+        read -p "  Overwrite? [y]es/[n]o/[a]ll/[N]one: " response </dev/tty
+        
+        case "$response" in
+            y|Y|yes|Yes|YES)
+                return 0
+                ;;
+            n|N|no|No|NO)
+                return 1
+                ;;
+            a|A|all|All|ALL)
+                return 2
+                ;;
+            N|none|None|NONE)
+                return 3
+                ;;
+            *)
+                log_warn "Invalid response. Please enter y, n, a, or N."
+                ;;
+        esac
+    done
+}
+
 # Generate project from template
 generate_project() {
     local template="$1"
     local project_name="$2"
     local target_dir="$3"
-    shift 3
+    local force="$4"
+    shift 4
     local vars=("$@")
     
     local template_path="$TEMPLATES_DIR/$template"
@@ -121,12 +154,18 @@ generate_project() {
     # Create target directory
     local project_path="$target_dir/$project_name"
     
+    # Check if directory exists but don't fail immediately
+    local dir_existed=false
     if [[ -d "$project_path" ]]; then
-        log_error "Directory '$project_path' already exists"
-        return 1
+        dir_existed=true
+        if [[ "$force" != "true" ]]; then
+            log_warn "Directory '$project_path' already exists"
+            log_info "Files will be created/overwritten as needed"
+        fi
+    else
+        mkdir -p "$project_path"
     fi
     
-    mkdir -p "$project_path"
     log_info "Creating project: $project_name"
     
     # Add default variables
@@ -135,6 +174,15 @@ generate_project() {
     vars+=("date=$(date +%Y-%m-%d)")
     
     # Copy and process template files
+    local overwrite_mode="ask"  # ask, all, none
+    local files_created=0
+    local files_skipped=0
+    local files_overwritten=0
+    
+    if [[ "$force" == "true" ]]; then
+        overwrite_mode="all"
+    fi
+    
     while IFS= read -r -d '' file; do
         local rel_path="${file#$template_path/}"
         
@@ -151,23 +199,82 @@ generate_project() {
         
         # Process file content
         if [[ -f "$file" ]]; then
-            local content
-            content=$(cat "$file")
-            content=$(replace_vars "$content" "${vars[@]}")
-            echo "$content" > "$target_file"
+            local should_write=true
+            local file_existed=false
             
-            # Preserve execute permissions
-            if [[ -x "$file" ]]; then
-                chmod +x "$target_file"
+            # Check if file exists and handle accordingly
+            if [[ -f "$target_file" ]]; then
+                file_existed=true
+                
+                case "$overwrite_mode" in
+                    all)
+                        should_write=true
+                        ;;
+                    none)
+                        should_write=false
+                        ;;
+                    ask)
+												prompt_overwrite "$rel_path"
+                        local result=$?
+                        case $result in
+                            0) # yes
+                                should_write=true
+                                ;;
+                            1) # no
+                                should_write=false
+                                ;;
+                            2) # all
+                                should_write=true
+                                overwrite_mode="all"
+                                log_info "Overwriting all remaining files"
+                                ;;
+                            3) # none
+                                should_write=false
+                                overwrite_mode="none"
+                                log_info "Skipping all remaining files"
+                                ;;
+                        esac
+                        ;;
+                esac
             fi
             
-            log_success "Created: $rel_path"
+            if [[ "$should_write" == true ]]; then
+                local content
+                content=$(cat "$file")
+                content=$(replace_vars "$content" "${vars[@]}")
+                echo "$content" > "$target_file"
+                
+                # Preserve execute permissions
+                if [[ -x "$file" ]]; then
+                    chmod +x "$target_file"
+                fi
+                
+                if [[ "$file_existed" == true ]]; then
+                    log_success "Overwritten: $rel_path"
+                    files_overwritten=$((files_overwritten+1))
+                else
+                    log_success "Created: $rel_path"
+                    files_created=$((files_created+1))
+                fi
+            else
+                log_warn "Skipped: $rel_path"
+                files_skipped=$((files_skipped+1))
+            fi
         fi
     done < <(find "$template_path" -type f -print0)
     
     echo
     log_success "Project '$project_name' generated successfully!"
     log_info "Location: $project_path"
+    
+    # Show summary
+    if [[ $files_created -gt 0 || $files_overwritten -gt 0 || $files_skipped -gt 0 ]]; then
+        echo
+        log_info "Summary:"
+        [[ $files_created -gt 0 ]] && echo "  Created: $files_created file(s)"
+        [[ $files_overwritten -gt 0 ]] && echo "  Overwritten: $files_overwritten file(s)"
+        [[ $files_skipped -gt 0 ]] && echo "  Skipped: $files_skipped file(s)"
+    fi
 }
 
 # Main function
@@ -182,6 +289,7 @@ main() {
     local template=""
     local project_name=""
     local target_dir="."
+    local force=false
     local vars=()
     
     while [[ $# -gt 0 ]]; do
@@ -201,6 +309,10 @@ main() {
             -v|--vars)
                 vars+=("$2")
                 shift 2
+                ;;
+            -f|--force)
+                force=true
+                shift
                 ;;
             -*)
                 log_error "Unknown option: $1"
@@ -236,7 +348,7 @@ main() {
     fi
     
     # Generate project
-    generate_project "$template" "$project_name" "$target_dir" "${vars[@]}"
+    generate_project "$template" "$project_name" "$target_dir" "$force" "${vars[@]}"
 }
 
 # Run main function

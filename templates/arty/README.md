@@ -15,14 +15,14 @@ A bash library repository management system built with arty.sh.
 ### Quick Install (curl)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_USERNAME/{{project_name}}/main/arty.sh | sudo tee /usr/local/bin/arty > /dev/null
+curl -sSL https://raw.githubusercontent.com/{{organization_name}}/{{project_name}}/main/arty.sh | sudo tee /usr/local/bin/arty > /dev/null
 sudo chmod +x /usr/local/bin/arty
 ```
 
 ### Manual Install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/{{project_name}}.git
+git clone https://github.com/{{organization_name}}/{{project_name}}.git
 cd {{project_name}}
 sudo cp arty.sh /usr/local/bin/arty
 sudo chmod +x /usr/local/bin/arty
@@ -41,7 +41,7 @@ This creates an `arty.yml` configuration file.
 ### Install a Library
 
 ```bash
-arty install https://github.com/user/bash-library.git
+arty install https://github.com/{{organization_name}}/{{demo_project_name}}.git
 ```
 
 ### Install with Custom Name
