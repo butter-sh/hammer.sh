@@ -15,24 +15,9 @@ dependencies:
 - yq # YAML parser (required)
 - jq # JSON processor (required)
 
-# Available commands/scripts
+# Available commands
 scripts:
-  generate: "bash leaf.sh"
-  docs: "bash leaf.sh ."
-  landing: "bash leaf.sh --landing"
-  landing-file: "bash leaf.sh --landing --projects-file projects.json"
-  help: "bash leaf.sh --help"
-  version: "bash leaf.sh --version"
-  test: "bash test.sh"
-
-# Features
-features:
-- Documentation generation from arty.sh projects
-- Landing page generation for butter.sh
-- YAML parsing with yq
-- JSON processing with jq
-- Modern responsive design with Tailwind CSS
-- Syntax highlighting with Highlight.js
-- Dark/light theme support
-- Debug mode for troubleshooting
-- Projects JSON from file or inline
+  test: "arty exec judge run"
+  test/update: "arty exec judge run -u"
+  test/setup: "arty exec judge setup"
+  test/verbose: "arty exec judge run -v"

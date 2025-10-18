@@ -1,0 +1,5 @@
+# Ignore all snapshot logs
+*.log
+
+# Keep the directory structure
+!.gitkeep
