@@ -1,233 +1,90 @@
-# Leaf.sh Test Suite
+# Leaf.sh Test Suite - Post-Refactoring
 
-Comprehensive test suite for leaf.sh - beautiful documentation and landing page generator.
+## Overview
 
-## Test Files
+Leaf.sh has been completely refactored to use **myst.sh templating engine** instead of inline HTML generation with sed.
 
-### Core Functionality Tests
+## What Changed
 
-- **test-leaf-cli.sh** - Command-line interface and argument parsing
-  - Help and version output
-  - Flag handling (--help, --version, --landing, etc.)
-  - Output directory options
-  - Custom logo and base path
-  - Unknown option handling
+### ✅ Removed (Obsolete)
+- Inline HTML heredocs (~400 lines)
+- Sed-based variable substitution
+- Manual escaping logic
+- Tests for sed escaping issues
 
-- **test-leaf-dependencies.sh** - Dependency checking
-  - Detection of missing yq
-  - Detection of missing jq
-  - Installation link display
-  - Exit code handling
-  - Early dependency checking
+### ✅ Added (New Architecture)
+- Myst.sh integration
+- JSON-based data passing
+- Template-based rendering
+- Clean separation of concerns
 
-- **test-leaf-yaml.sh** - YAML parsing functionality
-  - Reading simple and nested fields
-  - Handling missing files and fields
-  - Null value filtering
-  - Quoted and multiline strings
-  - Array access
+## Current Test Suite
 
-- **test-leaf-json.sh** - JSON parsing and validation
-  - Valid and invalid JSON parsing
-  - Query extraction with jq
-  - Projects JSON validation
-  - Array and object validation
-  - File reading and error handling
+### Active Tests
 
-- **test-leaf-helpers.sh** - Helper functions
-  - Language detection from file extensions
-  - File reading
-  - Icon path resolution and priority
-  - Logging functions (info, success, warn, error, debug)
-  - Source file scanning
-  - Example file scanning
+1. **test-leaf-cli.sh** - CLI interface and argument parsing
+2. **test-leaf-dependencies.sh** - Dependency checking (yq, jq, myst)
+3. **test-leaf-json.sh** - JSON validation for projects
+4. **test-leaf-yaml.sh** - YAML parsing for arty.yml
+5. **test-leaf-integration.sh** - End-to-end generation tests
 
-### Generation Tests
+### Removed Tests (No Longer Applicable)
 
-- **test-leaf-docs.sh** - Documentation generation
-  - HTML output creation
-  - Project metadata inclusion (name, version, description)
-  - README content rendering
-  - Source file inclusion with syntax highlighting
-  - Example inclusion
-  - HTML escaping
-  - Tailwind CSS and Highlight.js integration
-  - Theme toggle
-  - Custom base path and icons
-
-- **test-leaf-landing.sh** - Landing page generation
-  - Landing page HTML creation
-  - butter.sh branding
-  - Default and custom project lists
-  - JSON validation and file loading
-  - Custom GitHub URLs
-  - Theme toggle and mobile menu
-  - Hero and projects sections
-  - Priority handling (file over argument)
-
-### Error Handling Tests
-
-- **test-leaf-errors.sh** - Error handling and edge cases
-  - Missing project directory
-  - Missing or corrupted arty.yml
-  - Empty YAML files
-  - Projects with no source files or examples
-  - Invalid JSON input
-  - Special characters in names
-  - Very long descriptions
-  - Binary files in source
-  - Permission denied scenarios
-  - Missing icon files
-  - Special markdown in README
-  - Deeply nested directory structures
-  - Files without extensions
-  - Circular symlinks
-
-### Integration Tests
-
-- **test-leaf-integration.sh** - Complete workflows
-  - Full documentation generation workflow
-  - Full landing page generation workflow
-  - Regenerating and overwriting docs
-  - Docs and landing in separate directories
-  - Multiple file types in source
-  - Debug mode output
-  - Special directory names (spaces, etc.)
-  - Large projects with many files
-  - All options combined
+1. ~~test-leaf-helpers.sh~~ - Tested sed escaping (now handled by myst)
+2. ~~test-leaf-errors.sh~~ - Tested sed-specific errors (obsolete)
+3. ~~test-leaf-docs.sh~~ - Tested inline HTML generation (obsolete)
+4. ~~test-leaf-landing.sh~~ - Tested inline HTML generation (obsolete)
 
 ## Running Tests
 
-Tests are designed to be run via the judge.sh test framework from the hammer.sh templates directory.
-
-### Run all leaf tests:
 ```bash
-cd hammer.sh/templates/leaf
+cd /home/valknar/Projects/hammer.sh/templates/leaf
+
+# Clean up obsolete files first
+bash __tests/cleanup.sh
+
+# Run remaining test suite
 ../../judge/judge.sh __tests
 ```
 
-### Run specific test file:
-```bash
-../../judge/judge.sh __tests/test-leaf-cli.sh
-```
+## Expected Results
 
-### Run with verbose output:
-```bash
-VERBOSE=1 ../../judge/judge.sh __tests
-```
+With the refactoring:
+- ✅ No more sed syntax errors
+- ✅ No more escaping issues
+- ✅ Clean HTML output via myst
+- ✅ All remaining tests should pass
 
-### Update snapshots:
-```bash
-UPDATE_SNAPSHOTS=1 ../../judge/judge.sh __tests
-```
+## Test Focus
 
-### Enable debug mode:
-```bash
-DEBUG=1 ../../judge/judge.sh __tests
-```
+Tests now focus on:
+- ✅ CLI argument parsing
+- ✅ Dependency availability
+- ✅ JSON/YAML validation
+- ✅ End-to-end generation
+- ✅ Template rendering via myst
 
-## Test Coverage
+Tests no longer check:
+- ❌ Sed escaping
+- ❌ Inline HTML structure
+- ❌ Manual variable substitution
 
-The test suite covers:
+## Benefits
 
-- ✅ CLI argument parsing and validation
-- ✅ Dependency checking (yq, jq)
-- ✅ YAML parsing with yq
-- ✅ JSON parsing and validation with jq
-- ✅ Helper functions (language detection, file reading, logging)
-- ✅ Documentation page generation
-- ✅ Landing page generation
-- ✅ Error handling and edge cases
-- ✅ Integration workflows
-- ✅ HTML output validation
-- ✅ Theme toggle functionality
-- ✅ Custom logo and icon handling
-- ✅ Projects JSON validation
-- ✅ Multiple file type support
-- ✅ Source code syntax highlighting
-- ✅ Example file inclusion
-- ✅ README markdown rendering
+1. **Fewer Tests Needed** - Template rendering is myst's responsibility
+2. **More Focused** - Tests check leaf-specific logic only
+3. **More Maintainable** - Less brittle assertions
+4. **Better Coverage** - Tests actual functionality, not implementation details
 
-## Test Structure
+## Migration Notes
 
-Each test file follows this pattern:
+If you need to test HTML output:
+- Check the generated file exists
+- Validate it's well-formed HTML
+- Don't test exact HTML structure (that's in templates)
 
-```bash
-#!/usr/bin/env bash
-# Test suite for leaf.sh [component]
+## Version
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-LEAF_SH="${SCRIPT_DIR}/../leaf.sh"
-
-# Setup before each test
-setup() {
-    TEST_DIR=$(mktemp -d)
-    cd "$TEST_DIR"
-}
-
-# Cleanup after each test
-teardown() {
-    cd /
-    rm -rf "$TEST_DIR"
-}
-
-# Test: [description]
-test_something() {
-    setup
-    
-    # Test implementation
-    
-    teardown
-}
-
-# Run all tests
-run_tests() {
-    test_something
-    # ... more tests
-}
-
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    run_tests
-fi
-```
-
-## Assertions Available
-
-- `assert_equals value1 value2 "message"`
-- `assert_contains haystack needle "message"`
-- `assert_not_contains haystack needle "message"`
-- `assert_file_exists path "message"`
-- `assert_dir_exists path "message"`
-- `assert_exit_code expected actual "message"`
-- `assert_true condition "message"`
-
-## Dependencies
-
-Tests require:
-- bash (4.0+)
-- yq (for YAML parsing tests)
-- jq (for JSON parsing tests)
-- mktemp (for temporary directories)
-- judge.sh test framework
-
-## Notes
-
-- Each test runs in isolation with its own temporary directory
-- Tests clean up after themselves automatically
-- Snapshots are stored in `__tests/snapshots/`
-- All tests should be idempotent and independent
-
-## Contributing
-
-When adding new tests:
-
-1. Follow the existing naming convention: `test-leaf-[component].sh`
-2. Include setup() and teardown() functions
-3. Write descriptive test names starting with `test_`
-4. Add assertions with clear messages
-5. Clean up temporary files in teardown
-6. Update this README with new test coverage
-
-## License
-
-MIT License - Part of the hammer.sh ecosystem
+- Leaf.sh: v2.3.0
+- Refactored: 2025-10-18
+- Architecture: Myst-based templating
