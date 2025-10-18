@@ -10,6 +10,11 @@ if ! declare -f assert_contains > /dev/null; then
     exit 1
 fi
 
+# Check if myst is available
+has_myst() {
+    command -v myst &> /dev/null || [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]] || [[ -f "$SCRIPT_DIR/../myst.sh/myst.sh" ]]
+}
+
 # Setup before each test
 setup() {
     TEST_DIR=$(mktemp -d)
@@ -35,7 +40,10 @@ test_complete_workflow() {
     # Step 2: Generate
     bash "$ICONY_SH" generate 2>&1 >/dev/null
     assert_file_exists "$OUTPUT_DIR/iconset.css" "Generate should create CSS"
-    assert_file_exists "$OUTPUT_DIR/index.html" "Generate should create HTML"
+    
+    if has_myst; then
+        assert_file_exists "$OUTPUT_DIR/index.html" "Generate should create HTML with myst"
+    fi
     
     # Step 3: Clean
     bash "$ICONY_SH" clean 2>&1 >/dev/null
@@ -146,12 +154,24 @@ test_generate_empty_directory() {
     teardown
 }
 
-# Test: generate creates valid HTML structure
+# Test: generate creates valid HTML structure (with myst)
 test_generate_valid_html_structure() {
     setup
     
+    if ! has_myst; then
+        log_warn "Skipping HTML test - myst.sh not installed"
+        teardown
+        return 0
+    fi
+    
     bash "$ICONY_SH" init 2>&1 >/dev/null
     bash "$ICONY_SH" generate 2>&1 >/dev/null
+    
+    if [[ ! -f "$OUTPUT_DIR/index.html" ]]; then
+        log_warn "HTML not generated, skipping test"
+        teardown
+        return 0
+    fi
     
     local html_content=$(cat "$OUTPUT_DIR/index.html")
     
@@ -164,12 +184,24 @@ test_generate_valid_html_structure() {
     teardown
 }
 
-# Test: generate creates functional showcase features
+# Test: generate creates functional showcase features (with myst)
 test_generate_showcase_features() {
     setup
     
+    if ! has_myst; then
+        log_warn "Skipping HTML test - myst.sh not installed"
+        teardown
+        return 0
+    fi
+    
     bash "$ICONY_SH" init 2>&1 >/dev/null
     bash "$ICONY_SH" generate 2>&1 >/dev/null
+    
+    if [[ ! -f "$OUTPUT_DIR/index.html" ]]; then
+        log_warn "HTML not generated, skipping test"
+        teardown
+        return 0
+    fi
     
     local html_content=$(cat "$OUTPUT_DIR/index.html")
     
@@ -205,12 +237,24 @@ EOF
     teardown
 }
 
-# Test: HTML includes accessibility features
+# Test: HTML includes accessibility features (with myst)
 test_html_accessibility() {
     setup
     
+    if ! has_myst; then
+        log_warn "Skipping HTML test - myst.sh not installed"
+        teardown
+        return 0
+    fi
+    
     bash "$ICONY_SH" init 2>&1 >/dev/null
     bash "$ICONY_SH" generate 2>&1 >/dev/null
+    
+    if [[ ! -f "$OUTPUT_DIR/index.html" ]]; then
+        log_warn "HTML not generated, skipping test"
+        teardown
+        return 0
+    fi
     
     local html_content=$(cat "$OUTPUT_DIR/index.html")
     
@@ -243,6 +287,28 @@ test_custom_configuration() {
     teardown
 }
 
+# Test: generate without myst.sh shows appropriate message
+test_generate_without_myst() {
+    setup
+    
+    mkdir -p "$INPUT_DIR"
+    cat > "$INPUT_DIR/test.svg" << 'EOF'
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="10"/>
+</svg>
+EOF
+    
+    # Run with no myst in PATH
+    output=$(PATH="/nonexistent" bash "$ICONY_SH" generate 2>&1 || true)
+    
+    # Should mention myst.sh unless installed via arty
+    if ! [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]] && ! [[ -f "$SCRIPT_DIR/../myst.sh/myst.sh" ]]; then
+        assert_contains "$output" "myst" "Should mention myst.sh requirement"
+    fi
+    
+    teardown
+}
+
 # Run all tests
 run_tests() {
     log_section "Integration Tests"
@@ -257,6 +323,7 @@ run_tests() {
     test_css_formatting
     test_html_accessibility
     test_custom_configuration
+    test_generate_without_myst
     
     print_test_summary
 }

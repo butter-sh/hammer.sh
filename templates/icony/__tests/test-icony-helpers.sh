@@ -22,12 +22,12 @@ teardown() {
     rm -rf "$TEST_DIR"
 }
 
-# Test: check_dependencies detects python3
-test_check_dependencies_python3() {
+# Test: check_dependencies detects python3 and myst
+test_check_dependencies_success() {
     setup
     
-    # Test with python3 available
-    if command -v python3 &> /dev/null; then
+    # Test with python3 and myst available
+    if command -v python3 &> /dev/null && (command -v myst &> /dev/null || [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]]); then
         cat > "$TEST_DIR/test_deps.sh" << 'EOF'
 #!/usr/bin/env bash
 source "${1}"
@@ -35,8 +35,8 @@ if check_dependencies 2>&1; then
     echo "success"
 fi
 EOF
-        output=$(bash "$TEST_DIR/test_deps.sh" "$ICONY_SH")
-        assert_contains "$output" "success" "Should pass when python3 is available"
+        output=$(bash "$TEST_DIR/test_deps.sh" "$ICONY_SH" 2>&1)
+        assert_contains "$output" "success" "Should pass when dependencies are available"
     fi
     
     teardown
@@ -57,6 +57,34 @@ EOF
     
     assert_contains "$output" "python3" "Should report missing python3"
     assert_contains "$output" "failed" "Should fail without python3"
+    
+    teardown
+}
+
+# Test: check_dependencies fails without myst.sh
+test_check_dependencies_no_myst() {
+    setup
+    
+    cat > "$TEST_DIR/test_no_myst.sh" << 'EOF'
+#!/usr/bin/env bash
+# Remove myst from PATH but keep python3
+if command -v python3 &> /dev/null; then
+    PYTHON_PATH=$(command -v python3)
+    PYTHON_DIR=$(dirname "$PYTHON_PATH")
+    PATH="$PYTHON_DIR"
+    source "${1}"
+    check_dependencies 2>&1 || echo "failed"
+else
+    echo "python3 not available"
+fi
+EOF
+    
+    output=$(bash "$TEST_DIR/test_no_myst.sh" "$ICONY_SH")
+    
+    # Should mention myst unless it's installed via arty
+    if ! [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]] && ! [[ -f "$SCRIPT_DIR/../myst.sh/myst.sh" ]]; then
+        assert_contains "$output" "myst" "Should report missing myst.sh"
+    fi
     
     teardown
 }
@@ -157,6 +185,33 @@ EOF
     
     assert_contains "$output" "Installation instructions" "Should show installation header"
     assert_contains "$output" "python3" "Should mention python3"
+    assert_contains "$output" "myst" "Should mention myst.sh"
+    
+    teardown
+}
+
+# Test: find_myst locates myst.sh
+test_find_myst() {
+    setup
+    
+    cat > "$TEST_DIR/test_find_myst.sh" << 'EOF'
+#!/usr/bin/env bash
+source "${1}"
+if myst_cmd=$(find_myst); then
+    echo "found: $myst_cmd"
+else
+    echo "not found"
+fi
+EOF
+    
+    output=$(bash "$TEST_DIR/test_find_myst.sh" "$ICONY_SH" 2>&1)
+    
+    # Should either find myst or report not found
+    if command -v myst &> /dev/null || [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]] || [[ -f "$SCRIPT_DIR/../myst.sh/myst.sh" ]]; then
+        assert_contains "$output" "found" "Should find myst when available"
+    else
+        assert_contains "$output" "not found" "Should report when myst not available"
+    fi
     
     teardown
 }
@@ -165,12 +220,14 @@ EOF
 run_tests() {
     log_section "Helper Functions Tests"
     
-    test_check_dependencies_python3
+    test_check_dependencies_success
     test_check_dependencies_no_python3
+    test_check_dependencies_no_myst
     test_logging_functions
     test_normalize_svg
     test_svg_to_data_url
     test_show_install_instructions
+    test_find_myst
     
     print_test_summary
 }

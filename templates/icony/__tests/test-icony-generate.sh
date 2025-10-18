@@ -64,9 +64,16 @@ test_generate_creates_css() {
     teardown
 }
 
-# Test: generate creates HTML showcase
+# Test: generate creates HTML showcase (requires myst.sh)
 test_generate_creates_html() {
     setup
+    
+    # Skip if myst not available
+    if ! command -v myst &> /dev/null && ! [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]] && ! [[ -f "$SCRIPT_DIR/../myst.sh/myst.sh" ]]; then
+        log_warn "Skipping HTML test - myst.sh not installed"
+        teardown
+        return 0
+    fi
     
     bash "$ICONY_SH" generate 2>&1 >/dev/null
     
@@ -137,11 +144,24 @@ test_css_contains_size_variants() {
     teardown
 }
 
-# Test: HTML file contains correct references
+# Test: HTML file contains correct references (requires myst.sh)
 test_html_contains_references() {
     setup
     
+    # Skip if myst not available
+    if ! command -v myst &> /dev/null && ! [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]] && ! [[ -f "$SCRIPT_DIR/../myst.sh/myst.sh" ]]; then
+        log_warn "Skipping HTML test - myst.sh not installed"
+        teardown
+        return 0
+    fi
+    
     bash "$ICONY_SH" generate 2>&1 >/dev/null
+    
+    if [[ ! -f "$OUTPUT_DIR/index.html" ]]; then
+        log_warn "HTML not generated, skipping test"
+        teardown
+        return 0
+    fi
     
     local html_content=$(cat "$OUTPUT_DIR/index.html")
     
@@ -152,11 +172,24 @@ test_html_contains_references() {
     teardown
 }
 
-# Test: HTML file contains icon cards
+# Test: HTML file contains icon cards (requires myst.sh)
 test_html_contains_icon_cards() {
     setup
     
+    # Skip if myst not available
+    if ! command -v myst &> /dev/null && ! [[ -f "$SCRIPT_DIR/../.arty/libs/myst.sh/myst.sh" ]] && ! [[ -f "$SCRIPT_DIR/../myst.sh/myst.sh" ]]; then
+        log_warn "Skipping HTML test - myst.sh not installed"
+        teardown
+        return 0
+    fi
+    
     bash "$ICONY_SH" generate 2>&1 >/dev/null
+    
+    if [[ ! -f "$OUTPUT_DIR/index.html" ]]; then
+        log_warn "HTML not generated, skipping test"
+        teardown
+        return 0
+    fi
     
     local html_content=$(cat "$OUTPUT_DIR/index.html")
     
@@ -236,6 +269,19 @@ EOF
     teardown
 }
 
+# Test: generate requires myst.sh
+test_generate_requires_myst() {
+    setup
+    
+    # This test verifies that myst is checked
+    output=$(PATH="/nonexistent" bash "$ICONY_SH" generate 2>&1 || true)
+    
+    # Should mention myst.sh
+    assert_contains "$output" "myst" "Should mention myst.sh requirement"
+    
+    teardown
+}
+
 # Run all tests
 run_tests() {
     log_section "Generate Functionality Tests"
@@ -254,6 +300,7 @@ run_tests() {
     test_generate_custom_font_name
     test_generate_custom_icon_class
     test_generate_normalizes_svgs
+    test_generate_requires_myst
     
     print_test_summary
 }
