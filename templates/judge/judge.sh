@@ -69,7 +69,6 @@ main() {
 
     local command="$1"
     shift
-    
 
     case "$command" in
         run)

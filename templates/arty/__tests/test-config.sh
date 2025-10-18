@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Test configuration for arty.sh test suite
 # This file is sourced by test files to set common configuration
+export TEST_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Test directory structure
 export ARTY_SH_ROOT="$PWD"
@@ -19,7 +20,7 @@ export SNAPSHOT_VERBOSE="${VERBOSE:-0}"
 # Auto-discover all test files matching test-*.sh pattern
 shopt -s nullglob
 TEST_FILES_ARRAY=()
-for test_file in "${TESTS_DIR}"/test-arty-*.sh; do
+for test_file in ${TEST_ROOT}/test-arty-*.sh; do
     if [[ -f "$test_file" ]]; then
         TEST_FILES_ARRAY+=("$(basename "$test_file")")
     fi

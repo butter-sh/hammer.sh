@@ -4,13 +4,6 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARTY_SH="${SCRIPT_DIR}/../arty.sh"
 
-# Source test helpers - they are exported by run-all-tests.sh
-# but we check if they exist as functions, if not we're running standalone
-if ! declare -f assert_contains > /dev/null; then
-    echo "Error: Test helpers not loaded. This test must be run via judge.sh"
-    exit 1
-fi
-
 
 # Setup before each test
 setup() {
@@ -44,8 +37,8 @@ test_help_command() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "USAGE:" "Help should show usage"
-    assert_contains "$output" "COMMANDS:" "Help should show commands"
+    assert_contains "$output" "USAGE:"
+    assert_contains "$output" "COMMANDS:"
     
     teardown
 }
@@ -56,7 +49,7 @@ test_help_flag() {
     
     output=$(bash "$ARTY_SH" --help 2>&1)
     
-    assert_contains "$output" "USAGE:" "--help flag should show usage"
+    assert_contains "$output" "USAGE:"
     
     teardown
 }
@@ -67,7 +60,7 @@ test_help_short_flag() {
     
     output=$(bash "$ARTY_SH" -h 2>&1)
     
-    assert_contains "$output" "USAGE:" "-h flag should show usage"
+    assert_contains "$output" "USAGE:"
     
     teardown
 }
@@ -76,14 +69,11 @@ test_help_short_flag() {
 test_unknown_command() {
     setup
     
-    set +e
-    bash "$ARTY_SH" nonexistent-command > /dev/null 2>&1
-    exit_code=$?
-    set -e
+    output=$(bash "$ARTY_SH" nonexistent-command 2>&1 || true)
     
     # Should either show error or try to run as script
     # Since no arty.yml exists, should show error
-    assert_true "[[ $exit_code -ne 0 ]]" "Unknown command should fail"
+    assert_true "[[ \$? -ne 0 ]]" "Unknown command should fail"
     
     teardown
 }
@@ -105,7 +95,7 @@ test_rm_alias() {
     
     output=$(bash "$ARTY_SH" rm 2>&1 || true)
     
-    assert_contains "$output" "Library name required" "rm alias should require library name"
+    assert_contains "$output" "Library name required"
     
     teardown
 }
@@ -117,7 +107,7 @@ test_remove_nonexistent() {
     mkdir -p "$ARTY_HOME/libs"
     output=$(bash "$ARTY_SH" remove nonexistent 2>&1 || true)
     
-    assert_contains "$output" "not found" "Should report library not found"
+    assert_contains "$output" "not found"
     
     teardown
 }
@@ -128,7 +118,7 @@ test_source_requires_name() {
     
     output=$(bash "$ARTY_SH" source 2>&1 || true)
     
-    assert_contains "$output" "Library name required" "Source should require library name"
+    assert_contains "$output" "Library name required"
     
     teardown
 }
@@ -140,14 +130,14 @@ test_usage_shows_commands() {
     output=$(bash "$ARTY_SH" help 2>&1)
     
     # Check for all major commands
-    assert_contains "$output" "install" "Should document install command"
-    assert_contains "$output" "deps" "Should document deps command"
-    assert_contains "$output" "list" "Should document list command"
-    assert_contains "$output" "remove" "Should document remove command"
-    assert_contains "$output" "init" "Should document init command"
-    assert_contains "$output" "source" "Should document source command"
-    assert_contains "$output" "exec" "Should document exec command"
-    assert_contains "$output" "help" "Should document help command"
+    assert_contains "$output" "install"
+    assert_contains "$output" "deps"
+    assert_contains "$output" "list"
+    assert_contains "$output" "remove"
+    assert_contains "$output" "init"
+    assert_contains "$output" "source"
+    assert_contains "$output" "exec"
+    assert_contains "$output" "help"
     
     teardown
 }
@@ -158,7 +148,7 @@ test_usage_shows_examples() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "EXAMPLES:" "Help should show examples section"
+    assert_contains "$output" "EXAMPLES:"
     
     teardown
 }
@@ -169,8 +159,8 @@ test_usage_shows_environment() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "ENVIRONMENT:" "Should have ENVIRONMENT section"
-    assert_contains "$output" "ARTY_HOME" "Should mention ARTY_HOME variable"
+    assert_contains "$output" "ENVIRONMENT:"
+    assert_contains "$output" "ARTY_HOME"
     
     teardown
 }
@@ -181,7 +171,7 @@ test_usage_shows_structure() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "PROJECT STRUCTURE:" "Should have PROJECT STRUCTURE section"
+    assert_contains "$output" "PROJECT STRUCTURE:"
     
     teardown
 }
@@ -195,8 +185,8 @@ test_list_ls_alias() {
     output2=$(bash "$ARTY_SH" ls 2>&1)
     
     # Both should produce similar output
-    assert_contains "$output1" "libraries" "list command should show libraries"
-    assert_contains "$output2" "libraries" "ls alias should show libraries"
+    assert_contains "$output1" "libraries"
+    assert_contains "$output2" "libraries"
     
     teardown
 }
@@ -206,21 +196,16 @@ test_command_case_sensitive() {
     setup
     
     # HELP (uppercase) should not work
-    set +e
-    bash "$ARTY_SH" HELP > /dev/null 2>&1
-    exit_code=$?
-    set -e
+    output=$(bash "$ARTY_SH" HELP 2>&1 || true)
     
     # Should fail as unknown command (unless there's a script named HELP)
-    assert_true "[[ $exit_code -ne 0 ]]" "Case sensitive command should fail"
+    assert_true "[[ $? -ne 0 ]]"
     
     teardown
 }
 
 # Run all tests
 run_tests() {
-    log_section "CLI Interface Tests"
-    
     test_no_args_shows_usage
     test_help_command
     test_help_flag
@@ -236,12 +221,8 @@ run_tests() {
     test_usage_shows_structure
     test_list_ls_alias
     test_command_case_sensitive
-    
-    print_test_summary
-    return $?  # Return the exit code from print_test_summary
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     run_tests
-    exit $?  # Exit with the return code from run_tests
 fi

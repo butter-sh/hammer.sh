@@ -6,6 +6,10 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Force colors in test output even when piped - MUST be set before sourcing test-helpers
+export FORCE_COLOR=1
+
 source "${SCRIPT_DIR}/test-helpers.sh"
 
 # Export tests dir
@@ -147,15 +151,13 @@ compare_snapshot() {
 # ============================================================================
 
 clear
-cat << "EOF"
-╔════════════════════════════════════════════════════════════════╗
-║                                                                ║
-║              {{project_name}} TEST SUITE                       ║
-║              Version 1.0.0                                     ║
-║                                                                ║
-╚════════════════════════════════════════════════════════════════╝
-
-EOF
+echo -e "${CYAN}╔════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║                                                                ║${NC}"
+echo -e "${CYAN}║              {{project_name}} TEST SUITE                       ║${NC}"
+echo -e "${CYAN}║              Version 1.0.0                                     ║${NC}"
+echo -e "${CYAN}║                                                                ║${NC}"
+echo -e "${CYAN}╚════════════════════════════════════════════════════════════════╝${NC}"
+echo ""
 
 # ============================================================================
 # PRE-FLIGHT CHECKS
@@ -256,8 +258,9 @@ run_test_suite() {
 if [ -n "$SPECIFIC_TEST" ]; then
     run_test_suite "test-${SPECIFIC_TEST}.sh" "${SPECIFIC_TEST}" "${SPECIFIC_TEST}"
 else
-    # Add your test suites here
-    run_test_suite "test-example.sh" "Example Tests" "example"
+		for suite in "${TEST_FILES[@]}"; do
+        run_test_suite "${suite}" "${suite}" "${suite}"
+    done
 fi
 
 # ============================================================================
@@ -267,8 +270,8 @@ fi
 log_section "FINAL TEST REPORT"
 
 echo ""
-echo "Test Execution Summary:"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${CYAN}Test Execution Summary:${NC}"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
 if [ ${#FAILED_SUITES[@]} -eq 0 ]; then
@@ -288,16 +291,16 @@ else
     echo ""
 fi
 
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
 # Snapshot information
-echo "Snapshots:"
+echo -e "${BLUE}Snapshots:${NC}"
 echo "  Location: ${SNAPSHOT_DIR}"
 echo "  Timestamp: ${SNAPSHOT_TIMESTAMP}"
 
 if [ $UPDATE_SNAPSHOTS -eq 1 ]; then
-    echo "  Status: Master snapshots updated ✓"
+    echo -e "  Status: ${GREEN}Master snapshots updated ✓${NC}"
 else
     echo "  Status: Compared against master snapshots"
 fi
