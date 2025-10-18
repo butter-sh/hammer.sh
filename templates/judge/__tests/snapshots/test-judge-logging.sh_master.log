@@ -1,0 +1,7 @@
+[0;32m[PASS][0m Should contain message
+[0;32m[PASS][0m Should contain message
+[0;32m[PASS][0m Should increment counter
+[0;32m[PASS][0m Should contain message
+[0;31m[FAIL][0m Should increment counter
+  Command failed: [[ 0 -eq 1 ]]
+  Exit code: 1

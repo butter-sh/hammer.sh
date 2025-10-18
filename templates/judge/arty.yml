@@ -12,7 +12,7 @@ main: "{{project_name}}"
 
 # Scripts
 scripts:
-  test: "arty exec judge run"
-  test/update: "arty exec judge run -u"
-  test/setup: "arty exec judge setup"
-  test/verbose: "arty exec judge run -v"
+  test: "bash judge.sh run"
+  test/update: "bash judge.sh run -u"
+  test/setup: "bash judge.sh setup"
+  test/verbose: "bash judge.sh run -v"

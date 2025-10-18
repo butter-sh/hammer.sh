@@ -1,0 +1,8 @@
+[0;32m[PASS][0m Should show usage
+[0;32m[PASS][0m Should show commands
+[0;32m[PASS][0m Should show help header
+[0;32m[PASS][0m Should show master section
+[0;32m[PASS][0m Should show recent section
+[0;32m[PASS][0m Should show directory
+[0;32m[PASS][0m Should fail without test-id
+[0;32m[PASS][0m Should show error

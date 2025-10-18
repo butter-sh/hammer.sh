@@ -1,0 +1,16 @@
+[0;32m[PASS][0m Snapshot dir should exist
+[0;32m[PASS][0m Temp dir should exist
+[0;32m[PASS][0m Snapshot dir should still exist
+[0;32m[PASS][0m Temp dir should still exist
+[0;32m[PASS][0m Old file should be removed
+[0;32m[PASS][0m Temp dir should be recreated
+[0;32m[PASS][0m Temp dir should be removed
+[0;32m[PASS][0m Should handle missing directory gracefully
+[0;32m[PASS][0m Should capture stdout
+[0;32m[PASS][0m Should capture stderr
+
+[0;32m[PASS][0m Should capture exit code
+[0;32m[PASS][0m Should capture output
+[0;31m[FAIL][0m Should have exit code 0
+  Expected: 0
+  Actual:   99

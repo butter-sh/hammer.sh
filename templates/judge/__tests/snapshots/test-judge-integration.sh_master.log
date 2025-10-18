@@ -1,0 +1,8 @@
+[0;32m[PASS][0m Test should pass
+[0;32m[PASS][0m Test 1
+[0;32m[PASS][0m Test 2
+[0;32m[PASS][0m Test 3
+[0;32m[PASS][0m Should run 3 tests
+[0;31m[FAIL][0m All should pass
+  Expected: 3
+  Actual:   4

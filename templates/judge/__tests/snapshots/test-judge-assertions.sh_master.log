@@ -1,0 +1,39 @@
+[0;32m[PASS][0m Values should match
+[0;32m[PASS][0m Should increment passed counter
+[0;31m[FAIL][0m Values should not match
+  Expected: expected
+  Actual:   actual
+[0;32m[PASS][0m Should return non-zero
+[0;32m[PASS][0m Should increment failed counter
+[0;32m[PASS][0m Should find substring
+[0;32m[PASS][0m Should increment passed counter
+[0;31m[FAIL][0m Should not find substring
+  Expected to contain: Missing
+[0;32m[PASS][0m Should return non-zero
+[0;32m[PASS][0m Should increment failed counter
+[0;32m[PASS][0m Should not contain substring
+[0;32m[PASS][0m Should increment passed counter
+[0;31m[FAIL][0m Should fail when substring present
+  Expected NOT to contain: World
+[0;32m[PASS][0m Should return non-zero
+[0;32m[PASS][0m Exit codes should match
+[0;32m[PASS][0m Should increment passed counter
+[0;31m[FAIL][0m Exit codes should not match
+  Expected exit code: 0
+  Actual exit code:   1
+[0;32m[PASS][0m Should return non-zero
+[0;32m[PASS][0m File should exist
+[0;32m[PASS][0m Should increment passed counter
+[0;31m[FAIL][0m File should not exist
+  File not found: nonexistent.txt
+[0;32m[PASS][0m Should return non-zero
+[0;32m[PASS][0m Directory should exist
+[0;32m[PASS][0m Should increment passed counter
+[0;31m[FAIL][0m Directory should not exist
+  Directory not found: nonexistent
+[0;32m[PASS][0m Should return non-zero
+[0;32m[PASS][0m True command should pass
+[0;32m[PASS][0m Should increment passed counter
+[0;31m[FAIL][0m False command should fail
+  Command failed: false
+  Exit code: 1
