@@ -1,0 +1,44 @@
+
+[0;36m═══════════════════════════════════════════════════════[0m
+[0;36m  Init Asciinema Functionality Tests[0m
+[0;36m═══════════════════════════════════════════════════════[0m
+
+[0;32m[PASS][0m Should detect missing asciinema
+[0;32m[PASS][0m Should show install instructions
+[0;32m[PASS][0m Should return non-zero
+[0;32m[PASS][0m Should pass when asciinema present
+ℹ Created /tmp/tmp.kaj0PuNTmQ/demos directory
+
+═══════════════════════════════════════════
+  🎬 Starting asciinema recording
+═══════════════════════════════════════════
+
+Recording: /tmp/tmp.kaj0PuNTmQ/demos/test-demo.cast
+Title: test-demo
+
+Tips for great demos:
+  • Clear your terminal first (Ctrl+L)
+  • Set a clean prompt
+  • Type commands slowly
+  • Add pauses with 'sleep 2' between commands
+  • Use colors for better visibility
+
+To stop recording:
+  • Press Ctrl+D or type exit
+
+Starting in 3 seconds...
+✓ Recording saved: /tmp/tmp.kaj0PuNTmQ/demos/test-demo.cast
+
+ℹ Next steps:
+  init.sh play test-demo.cast      # Play it back
+  init.sh upload test-demo.cast    # Upload to asciinema.org
+
+[0;32m[PASS][0m Should create demos directory
+[0;32m[PASS][0m Should use demo.cast as default
+[0;32m[PASS][0m Should handle .cast extension
+[0;32m[PASS][0m Should not double extension
+[0;32m[PASS][0m Should show tips
+[0;32m[PASS][0m Should show stop instructions
+[0;32m[PASS][0m Should mention Ctrl+D
+[0;31m[FAIL][0m Should show usage
+  Expected to contain: Usage: init.sh play

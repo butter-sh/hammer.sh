@@ -1,0 +1,127 @@
+
+[0;36m═══════════════════════════════════════════════════════[0m
+[0;36m  Init Project Generation Tests[0m
+[0;36m═══════════════════════════════════════════════════════[0m
+
+ℹ Creating project structure...
+✓ Project structure created
+[0;32m[PASS][0m Project directory should exist
+[0;32m[PASS][0m src directory should exist
+[0;32m[PASS][0m lib directory should exist
+[0;32m[PASS][0m examples directory should exist
+[0;32m[PASS][0m tests directory should exist
+[0;32m[PASS][0m docs directory should exist
+[0;32m[PASS][0m demos directory should exist
+[0;32m[PASS][0m .arty directory should exist
+[0;32m[PASS][0m .arty/bin directory should exist
+[0;32m[PASS][0m .arty/libs directory should exist
+ℹ Creating project structure...
+✓ Project structure created
+[0;32m[PASS][0m cmd directory should exist for CLI
+[0;32m[PASS][0m internal directory should exist for CLI
+ℹ Creating project structure...
+✓ Project structure created
+[0;32m[PASS][0m public directory should exist for web
+[0;32m[PASS][0m routes directory should exist for web
+[0;32m[PASS][0m middleware directory should exist for web
+ℹ Creating project structure...
+✓ Project structure created
+[0;32m[PASS][0m modules directory should exist for lib
+[0;32m[PASS][0m utils directory should exist for lib
+ℹ Generating arty.yml...
+✓ Generated arty.yml (with asciinema commands!)
+[0;32m[PASS][0m arty.yml should be created
+[0;32m[PASS][0m Should have project name
+[0;32m[PASS][0m Should have version
+[0;32m[PASS][0m Should have description
+[0;32m[PASS][0m Should have author
+[0;32m[PASS][0m Should have MIT license
+[0;32m[PASS][0m Should have project type
+[0;32m[PASS][0m Should have main entry point
+[0;32m[PASS][0m Should have scripts section
+[0;32m[PASS][0m Should have references section
+ℹ Generating arty.yml...
+✓ Generated arty.yml (with asciinema commands!)
+[0;32m[PASS][0m CLI should have cmd/main.sh as main
+[0;32m[PASS][0m Should be CLI type
+ℹ Generating arty.yml...
+✓ Generated arty.yml (with asciinema commands!)
+[0;32m[PASS][0m Library should have lib/index.sh as main
+[0;32m[PASS][0m Should be lib type
+ℹ Generating arty.yml...
+✓ Generated arty.yml (with asciinema commands!)
+[0;32m[PASS][0m Web should have server.sh as main
+[0;32m[PASS][0m Should be web type
+ℹ Generating arty.yml...
+✓ Generated arty.yml (with asciinema commands!)
+[0;32m[PASS][0m Should have demo-rec script
+[0;32m[PASS][0m Should have demo-play script
+[0;32m[PASS][0m Should have demo-upload script
+[0;32m[PASS][0m Should have demo-list script
+ℹ Generating arty.yml...
+✓ Generated arty.yml (with asciinema commands!)
+[0;32m[PASS][0m Should have start script
+[0;32m[PASS][0m Should have test script
+[0;32m[PASS][0m Should have build script
+[0;32m[PASS][0m Should have lint script
+[0;32m[PASS][0m Should have docs script
+[0;32m[PASS][0m Should have clean script
+ℹ Generating arty.yml...
+✓ Generated arty.yml (with asciinema commands!)
+[0;32m[PASS][0m Should have env section
+[0;32m[PASS][0m Should have DEBUG var
+[0;32m[PASS][0m Should have LOG_LEVEL var
+ℹ Generating README.md...
+✓ Generated README.md (with asciinema section!)
+[0;32m[PASS][0m README.md should be created
+[0;32m[PASS][0m Should have project name as title
+[0;32m[PASS][0m Should mention arty.sh
+[0;32m[PASS][0m Should have quick start section
+[0;32m[PASS][0m Should have demo section
+[0;32m[PASS][0m Should have installation section
+[0;32m[PASS][0m Should have development section
+[0;32m[PASS][0m Should have documentation section
+[0;32m[PASS][0m Should have structure section
+ℹ Generating README.md...
+✓ Generated README.md (with asciinema section!)
+[0;32m[PASS][0m Should have demo section with emoji
+[0;32m[PASS][0m Should mention asciinema
+[0;32m[PASS][0m Should show recording command
+[0;32m[PASS][0m Should show play command
+[0;32m[PASS][0m Should show upload command
+[0;32m[PASS][0m Should show list command
+[0;32m[PASS][0m Should have recording demos subsection
+ℹ Generating README.md...
+✓ Generated README.md (with asciinema section!)
+[0;32m[PASS][0m Should show arty.yml in structure
+[0;32m[PASS][0m Should show src directory
+[0;32m[PASS][0m Should show lib directory
+[0;32m[PASS][0m Should show tests directory
+[0;32m[PASS][0m Should show demos directory
+[0;32m[PASS][0m Should show .arty directory
+ℹ Generating README.md...
+✓ Generated README.md (with asciinema section!)
+[0;32m[PASS][0m Should mention butter.sh ecosystem
+[0;32m[PASS][0m Should link to arty.sh
+[0;32m[PASS][0m Should link to leaf.sh
+[0;32m[PASS][0m Should link to hammer.sh
+[0;32m[PASS][0m Should link to asciinema
+ℹ Generating README.md...
+✓ Generated README.md (with asciinema section!)
+[0;32m[PASS][0m Should have features section
+[0;32m[PASS][0m Should list modern bash
+[0;32m[PASS][0m Should list dependency management
+[0;32m[PASS][0m Should list testing
+[0;32m[PASS][0m Should list docs
+[0;32m[PASS][0m Should list demo recording
+
+[0;36m═══════════════════════════════════════════════════════[0m
+[0;36m  TEST SUMMARY[0m
+[0;36m═══════════════════════════════════════════════════════[0m
+
+  Total Tests:  79
+  [0;32mPassed:       79[0m
+  [0;31mFailed:       0[0m
+  Pass Rate:    100%
+
+[0;32m✓ All tests passed![0m

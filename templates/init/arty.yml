@@ -16,10 +16,10 @@ main: "init.sh"
 
 # Available commands
 scripts:
-  init: "bash init.sh"
-  test: "bash init.sh test-project --skip-git --skip-deps"
-  demo: "bash init.sh demo-project --template cli"
-  help: "bash init.sh --help"
+  test: "arty exec judge run"
+  test/update: "arty exec judge run -u"
+  test/setup: "arty exec judge setup"
+  test/verbose: "arty exec judge run -v"
 
 # Environment
 env:

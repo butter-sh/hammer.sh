@@ -1,0 +1,57 @@
+
+[0;36m═══════════════════════════════════════════════════════[0m
+[0;36m  Init Core Functionality Tests[0m
+[0;36m═══════════════════════════════════════════════════════[0m
+
+[0;32m[PASS][0m Should show usage
+[0;32m[PASS][0m Should show project options
+[0;32m[PASS][0m Should show asciinema commands
+[0;32m[PASS][0m Should show templates
+[0;32m[PASS][0m Should show examples
+[0;32m[PASS][0m Should show version
+[0;32m[PASS][0m Should mention butter.sh ecosystem
+[0;32m[PASS][0m Should list features
+[0;32m[PASS][0m Should mention asciinema
+[0;32m[PASS][0m Should show banner
+[0;32m[PASS][0m Should detect existing commands
+[0;32m[PASS][0m Should not detect nonexistent commands
+[0;32m[PASS][0m Should report missing dependencies
+[0;32m[PASS][0m Should pass when dependencies present
+[0;32m[PASS][0m Should log info
+[0;32m[PASS][0m Should log success
+[0;32m[PASS][0m Should log warning
+[0;32m[PASS][0m Should log error
+[0;32m[PASS][0m Should log header
+[0;32m[PASS][0m Should show banner
+[0;32m[PASS][0m Should mention butter.sh
+[0;32m[PASS][0m Should mention asciinema
+[0;32m[PASS][0m RED should be set
+[0;32m[PASS][0m GREEN should be set
+[0;32m[PASS][0m BLUE should be set
+[0;32m[PASS][0m NC should be set
+[0;32m[PASS][0m Should have check emoji
+[0;32m[PASS][0m Should have rocket emoji
+[0;32m[PASS][0m Should have hammer emoji
+[0;32m[PASS][0m Should have camera emoji
+[0;32m[PASS][0m Help flag should show usage
+[0;32m[PASS][0m Help flag should show usage
+[0;32m[PASS][0m Version flag should show version
+[0;32m[PASS][0m Should show license
+[0;32m[PASS][0m Script should be sourceable
+[0;32m[PASS][0m ARTY_HOME should be set
+[0;32m[PASS][0m CONFIG_FILE should default to arty.yml
+[0;32m[PASS][0m DEMOS_DIR should default to demos
+[0;32m[PASS][0m INIT_VERSION should be set
+[0;31m[FAIL][0m FORCE_COLOR=1 should enable colors
+  Expected to contain: Colors enabled
+
+[0;36m═══════════════════════════════════════════════════════[0m
+[0;36m  TEST SUMMARY[0m
+[0;36m═══════════════════════════════════════════════════════[0m
+
+  Total Tests:  40
+  [0;32mPassed:       39[0m
+  [0;31mFailed:       1[0m
+  Pass Rate:    97%
+
+[0;31m✗ Some tests failed[0m
