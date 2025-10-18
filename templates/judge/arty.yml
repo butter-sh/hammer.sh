@@ -12,6 +12,7 @@ main: "{{project_name}}"
 
 # Scripts
 scripts:
-  run: "bash {{project_name}} run"
-  setup: "bash {{project_name}} setup"
-  snap: "bash {{project_name}} snap"
+  test: "arty exec judge run"
+  test/update: "arty exec judge run -u"
+  test/setup: "arty exec judge setup"
+  test/verbose: "arty exec judge run -v"
