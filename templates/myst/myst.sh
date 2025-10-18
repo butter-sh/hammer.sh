@@ -582,7 +582,7 @@ cmd_render() {
             -e|--env)
                 local prefix="${2:-MYST_}"
                 myst_load_env "$prefix"
-                if [[ "$2" =~ ^MYST_ ]]; then
+                if [[ -n "${2:-}" ]]; then
                     shift 2
                 else
                     shift
