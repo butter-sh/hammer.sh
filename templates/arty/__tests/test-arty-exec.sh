@@ -4,6 +4,12 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARTY_SH="${SCRIPT_DIR}/../arty.sh"
 
+# Source test helpers - they are exported by run-all-tests.sh
+if ! declare -f assert_contains > /dev/null; then
+    echo "Error: Test helpers not loaded. This test must be run via judge.sh"
+    exit 1
+fi
+
 
 # Setup before each test
 setup() {
@@ -33,7 +39,7 @@ EOF
     
     output=$(bash "$ARTY_SH" hello 2>&1)
     
-    assert_contains "$output" "Hello from script"
+    assert_contains "$output" "Hello from script" "Script should execute and output message"
     
     teardown
 }
@@ -51,7 +57,7 @@ EOF
     
     output=$(bash "$ARTY_SH" unknown-script 2>&1 || true)
     
-    assert_contains "$output" "Script not found"
+    assert_contains "$output" "Script not found" "Should report script not found"
     
     teardown
 }
@@ -71,10 +77,10 @@ EOF
     
     output=$(bash "$ARTY_SH" unknown 2>&1 || true)
     
-    assert_contains "$output" "Available scripts:"
-    assert_contains "$output" "build"
-    assert_contains "$output" "test"
-    assert_contains "$output" "deploy"
+    assert_contains "$output" "Available scripts:" "Should show available scripts"
+    assert_contains "$output" "build" "Should list build script"
+    assert_contains "$output" "test" "Should list test script"
+    assert_contains "$output" "deploy" "Should list deploy script"
     
     teardown
 }
@@ -85,7 +91,7 @@ test_exec_script_fails_without_config() {
     
     output=$(bash "$ARTY_SH" some-script 2>&1 || true)
     
-    assert_contains "$output" "Config file not found"
+    assert_contains "$output" "Config file not found" "Should report config file not found"
     
     teardown
 }
@@ -103,9 +109,9 @@ EOF
     
     output=$(bash "$ARTY_SH" complex 2>&1)
     
-    assert_contains "$output" "Part 1"
-    assert_contains "$output" "Part 2"
-    assert_contains "$output" "Part 3"
+    assert_contains "$output" "Part 1" "Should execute part 1"
+    assert_contains "$output" "Part 2" "Should execute part 2"
+    assert_contains "$output" "Part 3" "Should execute part 3"
     
     teardown
 }
@@ -123,7 +129,7 @@ EOF
     
     output=$(bash "$ARTY_SH" with-var 2>&1)
     
-    assert_contains "$output" "Hello World"
+    assert_contains "$output" "Hello World" "Should expand variables in script"
     
     teardown
 }
@@ -134,7 +140,7 @@ test_exec_lib_without_name_fails() {
     
     output=$(bash "$ARTY_SH" exec 2>&1 || true)
     
-    assert_contains "$output" "Library name required"
+    assert_contains "$output" "Library name required" "Exec should require library name"
     
     teardown
 }
@@ -146,7 +152,7 @@ test_exec_lib_nonexistent_fails() {
     mkdir -p "$ARTY_HOME/bin"
     output=$(bash "$ARTY_SH" exec nonexistent 2>&1 || true)
     
-    assert_contains "$output" "not found"
+    assert_contains "$output" "not found" "Should report library not found"
     
     teardown
 }
@@ -163,15 +169,17 @@ test_exec_lib_shows_available_on_error() {
     
     output=$(bash "$ARTY_SH" exec nonexistent 2>&1 || true)
     
-    assert_contains "$output" "Available executables:"
-    assert_contains "$output" "tool1"
-    assert_contains "$output" "tool2"
+    assert_contains "$output" "Available executables:" "Should show available executables"
+    assert_contains "$output" "tool1" "Should list tool1"
+    assert_contains "$output" "tool2" "Should list tool2"
     
     teardown
 }
 
 # Run all tests
 run_tests() {
+    log_section "Script Execution Tests"
+    
     test_exec_script_from_config
     test_exec_script_fails_for_unknown
     test_exec_script_shows_available_on_error
@@ -181,6 +189,8 @@ run_tests() {
     test_exec_lib_without_name_fails
     test_exec_lib_nonexistent_fails
     test_exec_lib_shows_available_on_error
+    
+    print_test_summary
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

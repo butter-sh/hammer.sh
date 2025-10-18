@@ -4,6 +4,12 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARTY_SH="${SCRIPT_DIR}/../arty.sh"
 
+# Source test helpers
+if ! declare -f assert_contains > /dev/null; then
+    echo "Error: Test helpers not loaded. This test must be run via judge.sh"
+    exit 1
+fi
+
 
 # Setup before each test
 setup() {
@@ -23,10 +29,10 @@ teardown() {
 test_init_creates_config() {
     setup
     
-    bash "$ARTY_SH" init test-project
+    bash "$ARTY_SH" init test-project 2>&1
     
-    assert_file_exists "$TEST_DIR/arty.yml"
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "name: \"test-project\""
+    assert_file_exists "$TEST_DIR/arty.yml" "Should create arty.yml file"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "name: \"test-project\"" "Config should contain project name"
     
     teardown
 }
@@ -35,11 +41,11 @@ test_init_creates_config() {
 test_init_creates_directories() {
     setup
     
-    bash "$ARTY_SH" init test-project
+    bash "$ARTY_SH" init test-project 2>&1
     
-    assert_dir_exists "$TEST_DIR/.arty"
-    assert_dir_exists "$TEST_DIR/.arty/bin"
-    assert_dir_exists "$TEST_DIR/.arty/libs"
+    assert_dir_exists "$TEST_DIR/.arty" "Should create .arty directory"
+    assert_dir_exists "$TEST_DIR/.arty/bin" "Should create bin directory"
+    assert_dir_exists "$TEST_DIR/.arty/libs" "Should create libs directory"
     
     teardown
 }
@@ -51,7 +57,7 @@ test_init_fails_if_config_exists() {
     echo "existing" > "$TEST_DIR/arty.yml"
     output=$(bash "$ARTY_SH" init test-project 2>&1 || true)
     
-    assert_contains "$output" "already exists"
+    assert_contains "$output" "already exists" "Should report that config already exists"
     
     teardown
 }
@@ -60,12 +66,14 @@ test_init_fails_if_config_exists() {
 test_init_uses_directory_name() {
     setup
     
+    # Create subdirectory and init there
     mkdir -p "$TEST_DIR/my-cool-project"
     cd "$TEST_DIR/my-cool-project"
-    bash "$ARTY_SH" init
     
-    assert_file_exists "arty.yml"
-    assert_contains "$(cat arty.yml)" "my-cool-project"
+    bash "$ARTY_SH" init 2>&1
+    
+    assert_file_exists "$TEST_DIR/my-cool-project/arty.yml" "Should create arty.yml in subdirectory"
+    assert_contains "$(cat $TEST_DIR/my-cool-project/arty.yml)" "my-cool-project" "Should use directory name as project name"
     
     teardown
 }
@@ -74,16 +82,16 @@ test_init_uses_directory_name() {
 test_init_creates_valid_yaml() {
     setup
     
-    bash "$ARTY_SH" init test-project
+    bash "$ARTY_SH" init test-project 2>&1
     
     # Check for required fields
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "name:"
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "version:"
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "description:"
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "license:"
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "references:"
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "main:"
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "scripts:"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "name:" "Should have name field"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "version:" "Should have version field"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "description:" "Should have description field"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "license:" "Should have license field"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "references:" "Should have references field"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "main:" "Should have main field"
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "scripts:" "Should have scripts field"
     
     teardown
 }
@@ -92,9 +100,9 @@ test_init_creates_valid_yaml() {
 test_init_sets_default_version() {
     setup
     
-    bash "$ARTY_SH" init test-project
+    bash "$ARTY_SH" init test-project 2>&1
     
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "version: \"0.1.0\""
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "version: \"0.1.0\"" "Should set default version to 0.1.0"
     
     teardown
 }
@@ -103,15 +111,17 @@ test_init_sets_default_version() {
 test_init_sets_mit_license() {
     setup
     
-    bash "$ARTY_SH" init test-project
+    bash "$ARTY_SH" init test-project 2>&1
     
-    assert_contains "$(cat $TEST_DIR/arty.yml)" "license: \"MIT\""
+    assert_contains "$(cat $TEST_DIR/arty.yml)" "license: \"MIT\"" "Should set default license to MIT"
     
     teardown
 }
 
 # Run all tests
 run_tests() {
+    log_section "Init Functionality Tests"
+    
     test_init_creates_config
     test_init_creates_directories
     test_init_fails_if_config_exists
@@ -119,6 +129,8 @@ run_tests() {
     test_init_creates_valid_yaml
     test_init_sets_default_version
     test_init_sets_mit_license
+    
+    print_test_summary
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

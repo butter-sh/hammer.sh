@@ -4,6 +4,12 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARTY_SH="${SCRIPT_DIR}/../arty.sh"
 
+# Source test helpers
+if ! declare -f assert_contains > /dev/null; then
+    echo "Error: Test helpers not loaded. This test must be run via judge.sh"
+    exit 1
+fi
+
 
 # Setup before each test
 setup() {
@@ -48,7 +54,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_field.sh" "$ARTY_SH" "$TEST_DIR/test.yml")
     
-    assert_equals "$output" "test-project"
+    assert_equals "test-project" "$output" "Should retrieve project name field"
     
     teardown
 }
@@ -65,7 +71,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_version.sh" "$ARTY_SH" "$TEST_DIR/test.yml")
     
-    assert_equals "$output" "1.2.3"
+    assert_equals "1.2.3" "$output" "Should retrieve version field"
     
     teardown
 }
@@ -82,7 +88,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_missing.sh" "$ARTY_SH")
     
-    assert_contains "$output" "not found"
+    assert_contains "$output" "not found" "Should handle missing file gracefully"
     
     teardown
 }
@@ -99,8 +105,8 @@ EOF
     
     output=$(bash "$TEST_DIR/test_array.sh" "$ARTY_SH" "$TEST_DIR/test.yml")
     
-    assert_contains "$output" "https://github.com/user/lib1.git"
-    assert_contains "$output" "https://github.com/user/lib2.git"
+    assert_contains "$output" "https://github.com/user/lib1.git" "Should retrieve first reference"
+    assert_contains "$output" "https://github.com/user/lib2.git" "Should retrieve second reference"
     
     teardown
 }
@@ -117,7 +123,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_script.sh" "$ARTY_SH" "$TEST_DIR/test.yml")
     
-    assert_equals "$output" "npm run build"
+    assert_equals "npm run build" "$output" "Should retrieve script command"
     
     teardown
 }
@@ -134,7 +140,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_missing_script.sh" "$ARTY_SH" "$TEST_DIR/test.yml")
     
-    assert_equals "$output" "null"
+    assert_equals "null" "$output" "Should return null for missing script"
     
     teardown
 }
@@ -151,9 +157,9 @@ EOF
     
     output=$(bash "$TEST_DIR/test_list_scripts.sh" "$ARTY_SH" "$TEST_DIR/test.yml")
     
-    assert_contains "$output" "build"
-    assert_contains "$output" "test"
-    assert_contains "$output" "deploy"
+    assert_contains "$output" "build" "Should list build script"
+    assert_contains "$output" "test" "Should list test script"
+    assert_contains "$output" "deploy" "Should list deploy script"
     
     teardown
 }
@@ -180,7 +186,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_empty.sh" "$ARTY_SH" "$TEST_DIR/empty.yml")
     
-    assert_equals "$output" "empty"
+    assert_equals "empty" "$output" "Should handle empty arrays"
     
     teardown
 }
@@ -204,13 +210,15 @@ EOF
     
     output=$(bash "$TEST_DIR/test_nested.sh" "$ARTY_SH" "$TEST_DIR/nested.yml")
     
-    assert_equals "$output" "value1"
+    assert_equals "value1" "$output" "Should retrieve nested field value"
     
     teardown
 }
 
 # Run all tests
 run_tests() {
+    log_section "YAML Parsing Tests"
+    
     test_get_yaml_field_simple
     test_get_yaml_field_version
     test_get_yaml_field_missing_file
@@ -220,6 +228,8 @@ run_tests() {
     test_list_yaml_scripts
     test_yaml_empty_array
     test_yaml_nested_field
+    
+    print_test_summary
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

@@ -4,6 +4,12 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARTY_SH="${SCRIPT_DIR}/../arty.sh"
 
+# Source test helpers
+if ! declare -f assert_contains > /dev/null; then
+    echo "Error: Test helpers not loaded. This test must be run via judge.sh"
+    exit 1
+fi
+
 
 # Setup before each test
 setup() {
@@ -31,7 +37,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_no_yq.sh" "$ARTY_SH")
     
-    assert_contains "$output" "yq is not installed"
+    assert_contains "$output" "yq is not installed" "Should detect missing yq"
     
     teardown
 }
@@ -56,7 +62,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_installed.sh" "$ARTY_HOME" "$ARTY_SH")
     
-    assert_equals "$output" "installed"
+    assert_equals "installed" "$output" "Should detect installed library"
     
     teardown
 }
@@ -81,7 +87,7 @@ EOF
     
     output=$(bash "$TEST_DIR/test_not_installed.sh" "$ARTY_HOME" "$ARTY_SH")
     
-    assert_equals "$output" "not installed"
+    assert_equals "not installed" "$output" "Should detect non-existent library"
     
     teardown
 }
@@ -111,8 +117,8 @@ EOF
     
     output=$(bash "$TEST_DIR/test_circular.sh" "$ARTY_SH")
     
-    assert_contains "$output" "lib1 marked"
-    assert_contains "$output" "unmarked"
+    assert_contains "$output" "lib1 marked" "Should mark library as installing"
+    assert_contains "$output" "unmarked" "Should unmark library after installing"
     
     teardown
 }
@@ -132,9 +138,9 @@ EOF
     
     output=$(bash "$TEST_DIR/test_lib_name.sh" "$ARTY_SH")
     
-    assert_contains "$output" "my-library"
-    assert_contains "$output" "another-lib"
-    assert_contains "$output" "ssh-lib"
+    assert_contains "$output" "my-library" "Should extract name from .git URL"
+    assert_contains "$output" "another-lib" "Should extract name from URL without .git"
+    assert_contains "$output" "ssh-lib" "Should extract name from SSH URL"
     
     teardown
 }
@@ -155,10 +161,10 @@ EOF
     
     output=$(bash "$TEST_DIR/test_logging.sh" "$ARTY_SH" 2>&1)
     
-    assert_contains "$output" "Info message"
-    assert_contains "$output" "Success message"
-    assert_contains "$output" "Warning message"
-    assert_contains "$output" "Error message"
+    assert_contains "$output" "Info message" "Should output info messages"
+    assert_contains "$output" "Success message" "Should output success messages"
+    assert_contains "$output" "Warning message" "Should output warning messages"
+    assert_contains "$output" "Error message" "Should output error messages"
     
     teardown
 }
@@ -178,9 +184,9 @@ EOF
     
     bash "$TEST_DIR/test_init.sh" "$ARTY_HOME" "$ARTY_SH" 2>/dev/null
     
-    assert_dir_exists "$ARTY_HOME"
-    assert_dir_exists "$ARTY_HOME/libs"
-    assert_dir_exists "$ARTY_HOME/bin"
+    assert_dir_exists "$ARTY_HOME" "Should create ARTY_HOME directory"
+    assert_dir_exists "$ARTY_HOME/libs" "Should create libs directory"
+    assert_dir_exists "$ARTY_HOME/bin" "Should create bin directory"
     
     teardown
 }
@@ -203,8 +209,8 @@ EOF
     
     output=$(bash "$TEST_DIR/test_idempotent.sh" "$ARTY_HOME" "$ARTY_SH" 2>&1)
     
-    assert_contains "$output" "success"
-    assert_dir_exists "$ARTY_HOME"
+    assert_contains "$output" "success" "Should handle multiple init_arty calls"
+    assert_dir_exists "$ARTY_HOME" "Directory should still exist"
     
     teardown
 }
@@ -233,14 +239,16 @@ EOF
     line2=$(echo "$output" | sed -n '2p')
     line3=$(echo "$output" | sed -n '3p')
     
-    assert_equals "$line1" "$line2"
-    assert_equals "$line2" "$line3"
+    assert_equals "$line1" "$line2" "Case variations should normalize the same (1==2)"
+    assert_equals "$line2" "$line3" "Case variations should normalize the same (2==3)"
     
     teardown
 }
 
 # Run all tests
 run_tests() {
+    log_section "Helper Functions Tests"
+    
     test_check_yq_detects_missing
     test_is_installed_check
     test_is_installed_not_found
@@ -250,6 +258,8 @@ run_tests() {
     test_init_arty_creates_dirs
     test_init_arty_idempotent
     test_normalize_lib_id_case_insensitive
+    
+    print_test_summary
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

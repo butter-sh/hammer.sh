@@ -19,7 +19,7 @@ export SNAPSHOT_VERBOSE="${VERBOSE:-0}"
 # Auto-discover all test files matching test-*.sh pattern
 shopt -s nullglob
 TEST_FILES_ARRAY=()
-for test_file in "${TESTS_DIR}"/test-*.sh; do
+for test_file in "${TESTS_DIR}"/test-arty-*.sh; do
     if [[ -f "$test_file" ]]; then
         TEST_FILES_ARRAY+=("$(basename "$test_file")")
     fi

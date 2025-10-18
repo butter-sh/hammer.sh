@@ -4,6 +4,12 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARTY_SH="${SCRIPT_DIR}/../arty.sh"
 
+# Source test helpers
+if ! declare -f assert_contains > /dev/null; then
+    echo "Error: Test helpers not loaded. This test must be run via judge.sh"
+    exit 1
+fi
+
 
 # Setup before each test
 setup() {
@@ -34,9 +40,9 @@ test_deps_creates_arty_directory() {
     
     bash "$ARTY_SH" deps 2>/dev/null || true
     
-    assert_dir_exists "$ARTY_HOME"
-    assert_dir_exists "$ARTY_HOME/libs"
-    assert_dir_exists "$ARTY_HOME/bin"
+    assert_dir_exists "$ARTY_HOME" "Should create ARTY_HOME directory"
+    assert_dir_exists "$ARTY_HOME/libs" "Should create libs directory"
+    assert_dir_exists "$ARTY_HOME/bin" "Should create bin directory"
     
     teardown
 }
@@ -45,10 +51,10 @@ test_deps_creates_arty_directory() {
 test_deps_with_empty_references() {
     setup
     
-    output=$(bash "$ARTY_SH" deps 2>&1)
+    bash "$ARTY_SH" deps 2>&1
     exit_code=$?
     
-    assert_equals "$exit_code" "0"
+    assert_exit_code 0 "$exit_code" "Should succeed with empty references"
     
     teardown
 }
@@ -60,7 +66,7 @@ test_deps_fails_without_config() {
     rm "$TEST_DIR/arty.yml"
     output=$(bash "$ARTY_SH" deps 2>&1 || true)
     
-    assert_contains "$output" "not found"
+    assert_contains "$output" "not found" "Should report config file not found"
     
     teardown
 }
@@ -72,7 +78,7 @@ test_install_creates_libs_directory() {
     # Try to install (will fail without actual repo, but should create directory)
     bash "$ARTY_SH" deps 2>/dev/null || true
     
-    assert_dir_exists "$ARTY_HOME/libs"
+    assert_dir_exists "$ARTY_HOME/libs" "Should create libs directory"
     
     teardown
 }
@@ -82,11 +88,11 @@ test_install_command_works() {
     setup
     
     # When no repo URL provided, should fall back to install_references
-    output=$(bash "$ARTY_SH" install 2>&1)
+    bash "$ARTY_SH" install 2>&1
     exit_code=$?
     
     # Should not crash
-    assert_equals "$exit_code" "0"
+    assert_exit_code 0 "$exit_code" "Install command should succeed"
     
     teardown
 }
@@ -106,8 +112,8 @@ EOF
     
     output=$(bash "$TEST_DIR/test_name.sh" "$ARTY_SH")
     
-    assert_contains "$output" "my-lib"
-    assert_contains "$output" "another-lib"
+    assert_contains "$output" "my-lib" "Should extract my-lib from URL"
+    assert_contains "$output" "another-lib" "Should extract another-lib from URL"
     
     teardown
 }
@@ -131,8 +137,8 @@ EOF
     first_line=$(echo "$output" | head -n1)
     second_line=$(echo "$output" | tail -n1)
     
-    assert_equals "$first_line" "$second_line"
-    assert_contains "$first_line" "my-lib"
+    assert_equals "$first_line" "$second_line" "Both URLs should normalize to same ID"
+    assert_contains "$first_line" "my-lib" "Normalized ID should contain my-lib"
     
     teardown
 }
@@ -144,7 +150,7 @@ test_list_empty_initially() {
     bash "$ARTY_SH" deps 2>/dev/null || true
     output=$(bash "$ARTY_SH" list 2>&1)
     
-    assert_contains "$output" "No libraries installed"
+    assert_contains "$output" "No libraries installed" "Should show no libraries message"
     
     teardown
 }
@@ -154,16 +160,19 @@ test_ls_alias_works() {
     setup
     
     bash "$ARTY_SH" deps 2>/dev/null || true
-    output=$(bash "$ARTY_SH" ls 2>&1)
+    bash "$ARTY_SH" ls 2>&1
+    exit_code=$?
     
     # Should not error
-    assert_success
+    assert_exit_code 0 "$exit_code" "ls alias should work without errors"
     
     teardown
 }
 
 # Run all tests
 run_tests() {
+    log_section "Install Functionality Tests"
+    
     test_deps_creates_arty_directory
     test_deps_with_empty_references
     test_deps_fails_without_config
@@ -173,6 +182,8 @@ run_tests() {
     test_normalize_lib_id
     test_list_empty_initially
     test_ls_alias_works
+    
+    print_test_summary
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
