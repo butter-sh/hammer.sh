@@ -296,7 +296,7 @@ init_project() {
     log_info "Initializing new arty project: $project_name"
     
     # Create local .arty folder structure
-    local local_arty_dir="$ARTY_BIN_DIR/.arty"
+    local local_arty_dir=".arty"
     local local_bin_dir="$local_arty_dir/bin"
     local local_libs_dir="$local_arty_dir/libs"
     
@@ -534,13 +534,7 @@ main() {
             ;;
         *)
             # Try to execute as a script from arty.yml
-            if [[ -f "$ARTY_CONFIG_FILE" ]]; then
-                exec_script "$command" "$@"
-            else
-                log_error "Unknown command: $command"
-                show_usage
-                exit 1
-            fi
+            exec_script "$command" "$@"
             ;;
     esac
 }

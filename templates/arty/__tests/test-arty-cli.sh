@@ -69,11 +69,12 @@ test_help_short_flag() {
 test_unknown_command() {
     setup
     
-    output=$(bash "$ARTY_SH" nonexistent-command 2>&1 || true)
+    bash "$ARTY_SH" nonexistent-command 2>&1 > /dev/null || true
+    exit_code=$?
     
     # Should either show error or try to run as script
     # Since no arty.yml exists, should show error
-    assert_true "[[ \$? -ne 0 ]]" "Unknown command should fail"
+    assert_true "[[ $exit_code -ne 0 ]]" "Unknown command should fail"
     
     teardown
 }
@@ -196,10 +197,11 @@ test_command_case_sensitive() {
     setup
     
     # HELP (uppercase) should not work
-    output=$(bash "$ARTY_SH" HELP 2>&1 || true)
+    bash "$ARTY_SH" HELP 2>&1 > /dev/null || true
+    exit_code=$?
     
     # Should fail as unknown command (unless there's a script named HELP)
-    assert_true "[[ $? -ne 0 ]]"
+    assert_true "[[ $exit_code -ne 0 ]]" "Case sensitive command should fail"
     
     teardown
 }
