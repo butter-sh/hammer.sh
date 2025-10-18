@@ -1,21 +1,31 @@
-Running integration tests...
+[0;32m[PASS][0m Test should pass
+[0;32m[PASS][0m File should exist
+[0;32m[PASS][0m File should be cleaned up
+[0;32m[PASS][0m Snapshot should be created
+[0;32m[PASS][0m Should pass with matching content
+[0;32m[PASS][0m Should contain info
+[0;32m[PASS][0m Should contain test
+[0;32m[PASS][0m Should contain success
+[0;32m[PASS][0m File 1 should exist
+[0;32m[PASS][0m File 2 should exist
+[0;32m[PASS][0m Subdir should exist
+[0;32m[PASS][0m Should capture failure
+[0;32m[PASS][0m Should be updated
+[0;32m[PASS][0m Should clean temp
+[0;32m[PASS][0m Equals should work
+[0;32m[PASS][0m Contains should work
+[0;32m[PASS][0m True should work
+[0;32m[PASS][0m False should work
+[0;32m[PASS][0m Should capture command output
+[0;32m[PASS][0m Should produce normalized output
 
-✓ Complete test lifecycle works
-✓ Multiple assertions work correctly
-✓ Setup and cleanup workflow works
-✓ Snapshot workflow works
-✓ Failed test increments counter
-✓ Summary returns failure with failed tests
-✗ Output capture failed (output='test', code=)
-✓ Logging sequence works
-✓ Assertion chaining works correctly
-✓ Complex snapshot comparison works
-✓ File operations work correctly
-✓ Error handling works
-✓ Nested assertions work
-✓ Snapshot update works
-✓ Temporary directory isolation works
+[0;36m═══════════════════════════════════════════════════════[0m
+[0;36m  TEST SUMMARY[0m
+[0;36m═══════════════════════════════════════════════════════[0m
 
-═══════════════════════════════════════
-Integration Tests: 14/15 passed
-═══════════════════════════════════════
+  Total Tests:  20
+  [0;32mPassed:       20[0m
+  [0;31mFailed:       0[0m
+  Pass Rate:    100%
+
+[0;32m✓ All tests passed![0m
