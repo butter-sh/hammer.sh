@@ -86,6 +86,24 @@ assert_equals() {
     fi
 }
 
+assert_not_equals() {
+    local expected="$1"
+    local actual="$2"
+    local test_name="$3"
+
+    TESTS_RUN=$((TESTS_RUN+1))
+
+    if [ "$expected" != "$actual" ]; then
+        log_pass "$test_name"
+        return 0
+    else
+        log_fail "$test_name"
+        echo "  Expected values to be different"
+        echo "  Both equal: $expected"
+        return 1
+    fi
+}
+
 assert_contains() {
     local haystack="$1"
     local needle="$2"
@@ -387,7 +405,7 @@ print_test_summary() {
 
 # Export functions for use in test scripts
 export -f log_test log_pass log_fail log_skip log_info log_warning log_error log_success log_section
-export -f assert_equals assert_contains assert_not_contains assert_exit_code
+export -f assert_equals assert_not_equals assert_contains assert_not_contains assert_exit_code
 export -f assert_file_exists assert_directory_exists
 export -f assert_true assert_false
 export -f normalize_output create_snapshot update_snapshot compare_snapshot

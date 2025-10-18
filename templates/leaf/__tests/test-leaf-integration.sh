@@ -4,6 +4,11 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LEAF_SH="${SCRIPT_DIR}/../leaf.sh"
 
+# Strip ANSI color codes
+strip_colors() {
+    sed 's/\x1b\[[0-9;]*m//g'
+}
+
 # Setup before each test
 setup() {
     TEST_DIR=$(mktemp -d)
@@ -79,7 +84,7 @@ EOF
 EOF
     
     # Generate docs
-    output=$(bash "$LEAF_SH" my-project -o docs 2>&1)
+    bash "$LEAF_SH" my-project -o docs 2>&1 >/dev/null
     
     # Verify output
     assert_file_exists "docs/index.html" "Should create docs"
@@ -93,6 +98,7 @@ EOF
     assert_contains "$html" "basic.sh" "Should include example"
     assert_contains "$html" "circle" "Should include icon"
     
+    output=$(bash "$LEAF_SH" my-project -o docs 2>&1 | strip_colors)
     assert_contains "$output" "Found 2 source files" "Should report source files"
     assert_contains "$output" "1 examples" "Should report examples"
     
