@@ -1,16 +1,22 @@
-[0;32m[PASS][0m Snapshot dir should exist
-[0;32m[PASS][0m Temp dir should exist
-[0;32m[PASS][0m Snapshot dir should still exist
-[0;32m[PASS][0m Temp dir should still exist
-[0;32m[PASS][0m Old file should be removed
-[0;32m[PASS][0m Temp dir should be recreated
-[0;32m[PASS][0m Temp dir should be removed
-[0;32m[PASS][0m Should handle missing directory gracefully
-[0;32m[PASS][0m Should capture stdout
-[0;32m[PASS][0m Should capture stderr
+Running environment management tests...
 
-[0;32m[PASS][0m Should capture exit code
-[0;32m[PASS][0m Should capture output
-[0;31m[FAIL][0m Should have exit code 0
-  Expected: 0
-  Actual:   99
+✓ setup_test_env creates directories
+✓ setup_test_env is idempotent
+✓ setup_test_env cleans temp directory
+✓ cleanup_test_env removes temp directory
+✓ cleanup handles missing directory
+✓ capture_output captures stdout
+✓ capture_output captures stderr
+
+✓ capture_output captures exit code
+✗ Success handling failed
+✗ Failure handling failed
+✓ capture_output handles complex commands
+✓ capture_output handles pipes
+✓ Temp directory isolation works
+✓ Snapshot directory persists
+✓ Functions are exported
+
+═══════════════════════════════════════
+Environment Tests: 13/15 passed
+═══════════════════════════════════════

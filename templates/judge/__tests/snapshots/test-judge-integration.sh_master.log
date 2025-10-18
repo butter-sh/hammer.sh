@@ -1,8 +1,21 @@
-[0;32m[PASS][0m Test should pass
-[0;32m[PASS][0m Test 1
-[0;32m[PASS][0m Test 2
-[0;32m[PASS][0m Test 3
-[0;32m[PASS][0m Should run 3 tests
-[0;31m[FAIL][0m All should pass
-  Expected: 3
-  Actual:   4
+Running integration tests...
+
+✓ Complete test lifecycle works
+✓ Multiple assertions work correctly
+✓ Setup and cleanup workflow works
+✓ Snapshot workflow works
+✓ Failed test increments counter
+✓ Summary returns failure with failed tests
+✗ Output capture failed (output='test', code=)
+✓ Logging sequence works
+✓ Assertion chaining works correctly
+✓ Complex snapshot comparison works
+✓ File operations work correctly
+✓ Error handling works
+✓ Nested assertions work
+✓ Snapshot update works
+✓ Temporary directory isolation works
+
+═══════════════════════════════════════
+Integration Tests: 14/15 passed
+═══════════════════════════════════════

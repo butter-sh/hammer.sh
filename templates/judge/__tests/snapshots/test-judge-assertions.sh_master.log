@@ -1,39 +1,23 @@
-[0;32m[PASS][0m Values should match
-[0;32m[PASS][0m Should increment passed counter
-[0;31m[FAIL][0m Values should not match
-  Expected: expected
-  Actual:   actual
-[0;32m[PASS][0m Should return non-zero
-[0;32m[PASS][0m Should increment failed counter
-[0;32m[PASS][0m Should find substring
-[0;32m[PASS][0m Should increment passed counter
-[0;31m[FAIL][0m Should not find substring
-  Expected to contain: Missing
-[0;32m[PASS][0m Should return non-zero
-[0;32m[PASS][0m Should increment failed counter
-[0;32m[PASS][0m Should not contain substring
-[0;32m[PASS][0m Should increment passed counter
-[0;31m[FAIL][0m Should fail when substring present
-  Expected NOT to contain: World
-[0;32m[PASS][0m Should return non-zero
-[0;32m[PASS][0m Exit codes should match
-[0;32m[PASS][0m Should increment passed counter
-[0;31m[FAIL][0m Exit codes should not match
-  Expected exit code: 0
-  Actual exit code:   1
-[0;32m[PASS][0m Should return non-zero
-[0;32m[PASS][0m File should exist
-[0;32m[PASS][0m Should increment passed counter
-[0;31m[FAIL][0m File should not exist
-  File not found: nonexistent.txt
-[0;32m[PASS][0m Should return non-zero
-[0;32m[PASS][0m Directory should exist
-[0;32m[PASS][0m Should increment passed counter
-[0;31m[FAIL][0m Directory should not exist
-  Directory not found: nonexistent
-[0;32m[PASS][0m Should return non-zero
-[0;32m[PASS][0m True command should pass
-[0;32m[PASS][0m Should increment passed counter
-[0;31m[FAIL][0m False command should fail
-  Command failed: false
-  Exit code: 1
+Running assertion function tests...
+
+✓ assert_equals increments passed counter
+✓ assert_equals fails correctly
+✓ assert_contains finds substring
+✓ assert_contains fails when substring absent
+✓ assert_not_contains works correctly
+✓ assert_not_contains fails when substring present
+✓ assert_exit_code works correctly
+✓ assert_exit_code fails on mismatch
+✓ assert_file_exists detects file
+✓ assert_file_exists fails for missing file
+✓ assert_directory_exists detects directory
+✓ assert_directory_exists fails for missing directory
+✓ assert_true works correctly
+✓ assert_true fails for false commands
+✓ assert_false works correctly
+✓ assert_false fails for true commands
+✓ Test counter increments correctly
+
+═══════════════════════════════════════
+Assertion Tests: 17/17 passed
+═══════════════════════════════════════

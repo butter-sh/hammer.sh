@@ -1,7 +1,24 @@
-[0;32m[PASS][0m Should contain message
-[0;32m[PASS][0m Should contain message
-[0;32m[PASS][0m Should increment counter
-[0;32m[PASS][0m Should contain message
-[0;31m[FAIL][0m Should increment counter
-  Command failed: [[ 0 -eq 1 ]]
-  Exit code: 1
+Running logging function tests...
+
+✓ log_test produces output
+✗ log_pass failed
+✗ log_fail failed
+✓ log_skip produces output
+✓ log_info produces output
+✓ log_warning produces output
+✓ log_error produces output
+✓ log_success produces output
+✓ log_section produces formatted output
+✓ Logging handles empty strings
+✓ Logging handles special characters
+✓ log_pass counter increments
+✓ log_fail counter increments
+✓ Summary shows counters
+✓ Summary returns 0 on success
+✓ Summary returns non-zero on failure
+✓ Summary handles zero tests
+✓ Pass rate calculated correctly
+
+═══════════════════════════════════════
+Logging Tests: 16/18 passed
+═══════════════════════════════════════

@@ -1,4 +1,5 @@
 .git/
 *.log
+snapshots/*.snapshot
 snapshots/*.log
 !snapshots/*_master.log

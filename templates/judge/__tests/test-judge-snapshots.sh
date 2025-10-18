@@ -10,7 +10,7 @@ setup() {
     export SNAPSHOT_DIR="$TEST_DIR/snapshots"
     mkdir -p "$SNAPSHOT_DIR"
     cd "$TEST_DIR"
-    source "$TEST_HELPERS"
+    source "$TEST_HELPERS" 2>/dev/null
 }
 
 # Cleanup after each test
@@ -23,36 +23,54 @@ teardown() {
 test_create_snapshot() {
     setup
     
-    create_snapshot "test-snap" "test content"
+    create_snapshot "test-snap" "test content" >/dev/null 2>&1
     
-    assert_file_exists "${SNAPSHOT_DIR}/test-snap.snapshot" "Snapshot file should be created"
-    
-    teardown
+    if [[ -f "${SNAPSHOT_DIR}/test-snap.snapshot" ]]; then
+        echo "✓ Snapshot file created"
+        teardown
+        return 0
+    else
+        echo "✗ Snapshot file not created"
+        teardown
+        return 1
+    fi
 }
 
 # Test: create_snapshot normalizes content
 test_create_snapshot_normalizes() {
     setup
     
-    create_snapshot "test-snap" "content with trailing spaces   "
+    create_snapshot "test-snap" "content with trailing spaces   " >/dev/null 2>&1
     
     content=$(cat "${SNAPSHOT_DIR}/test-snap.snapshot")
-    assert_true "[[ ! \"$content\" =~ [[:space:]]+$ ]]" "Should remove trailing spaces"
-    
-    teardown
+    if [[ ! "$content" =~ [[:space:]]+$ ]]; then
+        echo "✓ Trailing spaces removed"
+        teardown
+        return 0
+    else
+        echo "✗ Trailing spaces not removed"
+        teardown
+        return 1
+    fi
 }
 
 # Test: update_snapshot updates existing snapshot
 test_update_snapshot() {
     setup
     
-    create_snapshot "test-snap" "original content"
-    update_snapshot "test-snap" "updated content"
+    create_snapshot "test-snap" "original content" >/dev/null 2>&1
+    update_snapshot "test-snap" "updated content" >/dev/null 2>&1
     
     content=$(cat "${SNAPSHOT_DIR}/test-snap.snapshot")
-    assert_equals "updated content" "$content" "Snapshot should be updated"
-    
-    teardown
+    if [[ "$content" == "updated content" ]]; then
+        echo "✓ Snapshot updated"
+        teardown
+        return 0
+    else
+        echo "✗ Snapshot not updated correctly"
+        teardown
+        return 1
+    fi
 }
 
 # Test: compare_snapshot matches identical content
@@ -62,12 +80,18 @@ test_compare_snapshot_match() {
     TESTS_RUN=0
     TESTS_PASSED=0
     
-    create_snapshot "test-snap" "test content"
-    compare_snapshot "test-snap" "test content" "Snapshot comparison"
+    create_snapshot "test-snap" "test content" >/dev/null 2>&1
+    compare_snapshot "test-snap" "test content" "Snapshot comparison" >/dev/null 2>&1
     
-    assert_true "[[ $TESTS_PASSED -eq 1 ]]" "Should pass on match"
-    
-    teardown
+    if [[ $TESTS_PASSED -eq 1 ]]; then
+        echo "✓ Snapshot comparison passes on match"
+        teardown
+        return 0
+    else
+        echo "✗ Snapshot comparison failed on match"
+        teardown
+        return 1
+    fi
 }
 
 # Test: compare_snapshot fails on mismatch
@@ -77,16 +101,22 @@ test_compare_snapshot_mismatch() {
     TESTS_RUN=0
     TESTS_FAILED=0
     
-    create_snapshot "test-snap" "original content"
+    create_snapshot "test-snap" "original content" >/dev/null 2>&1
     
     set +e
-    compare_snapshot "test-snap" "different content" "Snapshot comparison"
+    compare_snapshot "test-snap" "different content" "Snapshot comparison" >/dev/null 2>&1
     result=$?
     set -e
     
-    assert_true "[[ $result -ne 0 ]]" "Should fail on mismatch"
-    
-    teardown
+    if [[ $result -ne 0 ]] && [[ $TESTS_FAILED -eq 1 ]]; then
+        echo "✓ Snapshot comparison fails on mismatch"
+        teardown
+        return 0
+    else
+        echo "✗ Snapshot comparison mismatch behavior incorrect"
+        teardown
+        return 1
+    fi
 }
 
 # Test: compare_snapshot creates missing snapshot
@@ -96,12 +126,17 @@ test_compare_snapshot_creates_missing() {
     TESTS_RUN=0
     TESTS_PASSED=0
     
-    compare_snapshot "new-snap" "new content" "New snapshot"
+    compare_snapshot "new-snap" "new content" "New snapshot" >/dev/null 2>&1
     
-    assert_file_exists "${SNAPSHOT_DIR}/new-snap.snapshot" "Should create missing snapshot"
-    assert_true "[[ $TESTS_PASSED -eq 1 ]]" "Should pass when creating"
-    
-    teardown
+    if [[ -f "${SNAPSHOT_DIR}/new-snap.snapshot" ]] && [[ $TESTS_PASSED -eq 1 ]]; then
+        echo "✓ Missing snapshot created"
+        teardown
+        return 0
+    else
+        echo "✗ Missing snapshot not created correctly"
+        teardown
+        return 1
+    fi
 }
 
 # Test: normalize_output removes ANSI codes
@@ -111,10 +146,15 @@ test_normalize_output_ansi() {
     input=$'\033[0;31mRed text\033[0m'
     output=$(normalize_output "$input")
     
-    assert_true "[[ ! \"$output\" =~ $'\033' ]]" "Should remove ANSI codes"
-    assert_contains "$output" "Red text" "Should preserve text"
-    
-    teardown
+    if [[ ! "$output" =~ $'\033' ]] && [[ "$output" == *"Red text"* ]]; then
+        echo "✓ ANSI codes removed"
+        teardown
+        return 0
+    else
+        echo "✗ ANSI codes not removed correctly"
+        teardown
+        return 1
+    fi
 }
 
 # Test: normalize_output removes trailing whitespace
@@ -124,9 +164,15 @@ test_normalize_output_whitespace() {
     input="content with spaces   "
     output=$(normalize_output "$input")
     
-    assert_true "[[ ! \"$output\" =~ [[:space:]]+$ ]]" "Should remove trailing whitespace"
-    
-    teardown
+    if [[ ! "$output" =~ [[:space:]]+$ ]]; then
+        echo "✓ Trailing whitespace removed"
+        teardown
+        return 0
+    else
+        echo "✗ Trailing whitespace not removed"
+        teardown
+        return 1
+    fi
 }
 
 # Test: snapshot comparison ignores whitespace differences
@@ -136,12 +182,18 @@ test_snapshot_whitespace_insensitive() {
     TESTS_RUN=0
     TESTS_PASSED=0
     
-    create_snapshot "test-snap" "content"
-    compare_snapshot "test-snap" "content   " "Whitespace test"
+    create_snapshot "test-snap" "content" >/dev/null 2>&1
+    compare_snapshot "test-snap" "content   " "Whitespace test" >/dev/null 2>&1
     
-    assert_true "[[ $TESTS_PASSED -eq 1 ]]" "Should ignore trailing whitespace"
-    
-    teardown
+    if [[ $TESTS_PASSED -eq 1 ]]; then
+        echo "✓ Whitespace differences ignored"
+        teardown
+        return 0
+    else
+        echo "✗ Whitespace differences not ignored"
+        teardown
+        return 1
+    fi
 }
 
 # Test: snapshot comparison ignores ANSI codes
@@ -151,43 +203,66 @@ test_snapshot_ansi_insensitive() {
     TESTS_RUN=0
     TESTS_PASSED=0
     
-    create_snapshot "test-snap" "plain text"
-    compare_snapshot "test-snap" $'\033[0;32mplain text\033[0m' "ANSI test"
+    create_snapshot "test-snap" "plain text" >/dev/null 2>&1
+    compare_snapshot "test-snap" $'\033[0;32mplain text\033[0m' "ANSI test" >/dev/null 2>&1
     
-    assert_true "[[ $TESTS_PASSED -eq 1 ]]" "Should ignore ANSI codes"
-    
-    teardown
+    if [[ $TESTS_PASSED -eq 1 ]]; then
+        echo "✓ ANSI codes ignored in comparison"
+        teardown
+        return 0
+    else
+        echo "✗ ANSI codes not ignored"
+        teardown
+        return 1
+    fi
 }
 
 # Test: multiple snapshots can coexist
 test_multiple_snapshots() {
     setup
     
-    create_snapshot "snap1" "content 1"
-    create_snapshot "snap2" "content 2"
-    create_snapshot "snap3" "content 3"
+    create_snapshot "snap1" "content 1" >/dev/null 2>&1
+    create_snapshot "snap2" "content 2" >/dev/null 2>&1
+    create_snapshot "snap3" "content 3" >/dev/null 2>&1
     
-    assert_file_exists "${SNAPSHOT_DIR}/snap1.snapshot" "Snapshot 1 should exist"
-    assert_file_exists "${SNAPSHOT_DIR}/snap2.snapshot" "Snapshot 2 should exist"
-    assert_file_exists "${SNAPSHOT_DIR}/snap3.snapshot" "Snapshot 3 should exist"
-    
-    content1=$(cat "${SNAPSHOT_DIR}/snap1.snapshot")
-    content2=$(cat "${SNAPSHOT_DIR}/snap2.snapshot")
-    
-    assert_true "[[ \"$content1\" != \"$content2\" ]]" "Snapshots should be independent"
-    
-    teardown
+    if [[ -f "${SNAPSHOT_DIR}/snap1.snapshot" ]] && \
+       [[ -f "${SNAPSHOT_DIR}/snap2.snapshot" ]] && \
+       [[ -f "${SNAPSHOT_DIR}/snap3.snapshot" ]]; then
+        
+        content1=$(cat "${SNAPSHOT_DIR}/snap1.snapshot")
+        content2=$(cat "${SNAPSHOT_DIR}/snap2.snapshot")
+        
+        if [[ "$content1" != "$content2" ]]; then
+            echo "✓ Multiple snapshots coexist independently"
+            teardown
+            return 0
+        else
+            echo "✗ Snapshots not independent"
+            teardown
+            return 1
+        fi
+    else
+        echo "✗ Not all snapshots created"
+        teardown
+        return 1
+    fi
 }
 
 # Test: snapshot names can include hyphens
 test_snapshot_names_with_hyphens() {
     setup
     
-    create_snapshot "test-snap-name-123" "content"
+    create_snapshot "test-snap-name-123" "content" >/dev/null 2>&1
     
-    assert_file_exists "${SNAPSHOT_DIR}/test-snap-name-123.snapshot" "Snapshot with hyphens should work"
-    
-    teardown
+    if [[ -f "${SNAPSHOT_DIR}/test-snap-name-123.snapshot" ]]; then
+        echo "✓ Hyphens in snapshot names work"
+        teardown
+        return 0
+    else
+        echo "✗ Hyphens in snapshot names don't work"
+        teardown
+        return 1
+    fi
 }
 
 # Test: snapshot handles multiline content
@@ -201,12 +276,18 @@ test_snapshot_multiline() {
 line 2
 line 3"
     
-    create_snapshot "multiline" "$multiline"
-    compare_snapshot "multiline" "$multiline" "Multiline test"
+    create_snapshot "multiline" "$multiline" >/dev/null 2>&1
+    compare_snapshot "multiline" "$multiline" "Multiline test" >/dev/null 2>&1
     
-    assert_true "[[ $TESTS_PASSED -eq 1 ]]" "Should handle multiline content"
-    
-    teardown
+    if [[ $TESTS_PASSED -eq 1 ]]; then
+        echo "✓ Multiline content handled"
+        teardown
+        return 0
+    else
+        echo "✗ Multiline content not handled correctly"
+        teardown
+        return 1
+    fi
 }
 
 # Test: snapshot handles empty content
@@ -216,32 +297,56 @@ test_snapshot_empty() {
     TESTS_RUN=0
     TESTS_PASSED=0
     
-    create_snapshot "empty" ""
-    compare_snapshot "empty" "" "Empty test"
+    create_snapshot "empty" "" >/dev/null 2>&1
+    compare_snapshot "empty" "" "Empty test" >/dev/null 2>&1
     
-    assert_true "[[ $TESTS_PASSED -eq 1 ]]" "Should handle empty content"
-    
-    teardown
+    if [[ $TESTS_PASSED -eq 1 ]]; then
+        echo "✓ Empty content handled"
+        teardown
+        return 0
+    else
+        echo "✗ Empty content not handled correctly"
+        teardown
+        return 1
+    fi
 }
 
 # Run all tests
 run_tests() {
-    test_create_snapshot
-    test_create_snapshot_normalizes
-    test_update_snapshot
-    test_compare_snapshot_match
-    test_compare_snapshot_mismatch
-    test_compare_snapshot_creates_missing
-    test_normalize_output_ansi
-    test_normalize_output_whitespace
-    test_snapshot_whitespace_insensitive
-    test_snapshot_ansi_insensitive
-    test_multiple_snapshots
-    test_snapshot_names_with_hyphens
-    test_snapshot_multiline
-    test_snapshot_empty
+    local total=14
+    local passed=0
+    
+    echo "Running snapshot functionality tests..."
+    echo ""
+    
+    test_create_snapshot && passed=$((passed + 1))
+    test_create_snapshot_normalizes && passed=$((passed + 1))
+    test_update_snapshot && passed=$((passed + 1))
+    test_compare_snapshot_match && passed=$((passed + 1))
+    test_compare_snapshot_mismatch && passed=$((passed + 1))
+    test_compare_snapshot_creates_missing && passed=$((passed + 1))
+    test_normalize_output_ansi && passed=$((passed + 1))
+    test_normalize_output_whitespace && passed=$((passed + 1))
+    test_snapshot_whitespace_insensitive && passed=$((passed + 1))
+    test_snapshot_ansi_insensitive && passed=$((passed + 1))
+    test_multiple_snapshots && passed=$((passed + 1))
+    test_snapshot_names_with_hyphens && passed=$((passed + 1))
+    test_snapshot_multiline && passed=$((passed + 1))
+    test_snapshot_empty && passed=$((passed + 1))
+    
+    echo ""
+    echo "═══════════════════════════════════════"
+    echo "Snapshot Tests: $passed/$total passed"
+    echo "═══════════════════════════════════════"
+    
+    if [[ $passed -eq $total ]]; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     run_tests
+    exit $?
 fi

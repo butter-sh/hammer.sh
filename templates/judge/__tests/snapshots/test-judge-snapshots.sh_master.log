@@ -1,22 +1,20 @@
-[0;34m[INFO][0m Created snapshot: test-snap
-[0;32m[PASS][0m Snapshot file should be created
-[0;34m[INFO][0m Created snapshot: test-snap
-[0;32m[PASS][0m Should remove trailing spaces
-[0;34m[INFO][0m Created snapshot: test-snap
-[0;34m[INFO][0m Created snapshot: test-snap
-[0;34m[INFO][0m Updated snapshot: test-snap
-[0;32m[PASS][0m Snapshot should be updated
-[0;34m[INFO][0m Created snapshot: test-snap
-[0;32m[PASS][0m Snapshot comparison
-[0;32m[PASS][0m Should pass on match
-[0;34m[INFO][0m Created snapshot: test-snap
-[0;31m[FAIL][0m Snapshot comparison - Snapshot mismatch
-  Snapshot: /home/valknar/Projects/hammer.sh/templates/judge/snapshots/test-snap.snapshot
-  Use -v flag to see diff
-  Run with UPDATE_SNAPSHOTS=1 to update snapshots
-[0;32m[PASS][0m Should fail on mismatch
-[0;32m[PASS][0m New snapshot
-[0;32m[PASS][0m Should create missing snapshot
-[0;31m[FAIL][0m Should pass when creating
-  Command failed: [[ 2 -eq 1 ]]
-  Exit code: 1
+Running snapshot functionality tests...
+
+✓ Snapshot file created
+✓ Trailing spaces removed
+✓ Snapshot updated
+✓ Snapshot comparison passes on match
+✓ Snapshot comparison fails on mismatch
+✓ Missing snapshot created
+✓ ANSI codes removed
+✓ Trailing whitespace removed
+✓ Whitespace differences ignored
+✓ ANSI codes ignored in comparison
+✓ Multiple snapshots coexist independently
+✓ Hyphens in snapshot names work
+✓ Multiline content handled
+✓ Empty content handled
+
+═══════════════════════════════════════
+Snapshot Tests: 14/14 passed
+═══════════════════════════════════════
