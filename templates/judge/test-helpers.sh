@@ -152,7 +152,15 @@ assert_exit_code() {
 
     TESTS_RUN=$((TESTS_RUN+1))
 
-    if [ "$expected_code" -eq "$actual_code" ]; then
+    # Ensure both codes are set, default to empty string representation
+    if [[ -z "$expected_code" ]]; then
+        expected_code="(empty)"
+    fi
+    if [[ -z "$actual_code" ]]; then
+        actual_code="(empty)"
+    fi
+
+    if [[ "$expected_code" -eq "$actual_code" ]] 2>/dev/null; then
         log_pass "$test_name"
         return 0
     else
@@ -362,23 +370,28 @@ cleanup_test_env() {
 # ============================================================================
 
 print_test_summary() {
+    # Ensure counters are initialized with default values
+    local tests_run=${TESTS_RUN:-0}
+    local tests_passed=${TESTS_PASSED:-0}
+    local tests_failed=${TESTS_FAILED:-0}
+
     echo ""
     echo -e "${CYAN}═══════════════════════════════════════════════════════${NC}"
     echo -e "${CYAN}  TEST SUMMARY${NC}"
     echo -e "${CYAN}═══════════════════════════════════════════════════════${NC}"
     echo ""
-    echo "  Total Tests:  $TESTS_RUN"
-    echo -e "  ${GREEN}Passed:       $TESTS_PASSED${NC}"
-    echo -e "  ${RED}Failed:       $TESTS_FAILED${NC}"
+    echo "  Total Tests:  $tests_run"
+    echo -e "  ${GREEN}Passed:       $tests_passed${NC}"
+    echo -e "  ${RED}Failed:       $tests_failed${NC}"
 
-    if [ $TESTS_RUN -gt 0 ]; then
-        local pass_rate=$((TESTS_PASSED * 100 / TESTS_RUN))
+    if [ $tests_run -gt 0 ]; then
+        local pass_rate=$((tests_passed * 100 / tests_run))
         echo "  Pass Rate:    ${pass_rate}%"
     fi
 
     echo ""
 
-    if [ $TESTS_FAILED -eq 0 ]; then
+    if [ $tests_failed -eq 0 ]; then
         echo -e "${GREEN}✓ All tests passed!${NC}"
         echo ""
         return 0
