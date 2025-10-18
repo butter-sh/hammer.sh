@@ -27,9 +27,10 @@ teardown() {
 test_complete_init_workflow() {
     setup
     
-    # Initialize project
+    # Initialize project (note: when project name given, it uses it for the config name field)
     bash "$ARTY_SH" init my-project 2>&1
     
+    # Check in current directory since ARTY_CONFIG_FILE is set to $TEST_DIR/arty.yml
     assert_file_exists "$TEST_DIR/arty.yml" "Config file should be created"
     assert_directory_exists "$TEST_DIR/.arty" "ARTY directory should be created"
     assert_directory_exists "$TEST_DIR/.arty/bin" "Bin directory should be created"
@@ -54,7 +55,7 @@ name: "workflow-test"
 version: "1.0.0"
 scripts:
   setup: "mkdir -p build && echo 'Setup complete' > build/setup.log"
-  build: "echo 'Building...' > build/build.log && echo 'Build complete'"
+  build: "echo 'Building...' > build/build.log && echo 'Build complete' >> build/build.log"
   test: "cat build/setup.log && cat build/build.log && echo 'All tests passed'"
 EOF
     

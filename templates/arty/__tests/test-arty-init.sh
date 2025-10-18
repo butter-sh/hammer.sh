@@ -70,6 +70,9 @@ test_init_uses_directory_name() {
     mkdir -p "$TEST_DIR/my-cool-project"
     cd "$TEST_DIR/my-cool-project"
     
+    # Unset ARTY_CONFIG_FILE so it uses the default relative path
+    unset ARTY_CONFIG_FILE
+    
     bash "$ARTY_SH" init 2>&1
     
     assert_file_exists "$TEST_DIR/my-cool-project/arty.yml" "Should create arty.yml in subdirectory"
