@@ -13,8 +13,8 @@ main: "arty.sh"
 
 # Available commands/scripts
 scripts:
-  install: "bash arty.sh install"
+  install: "arty install"
   test: "arty exec judge run"
-  test:update: "arty exec judge run -u"
-  test:setup: "arty exec judge setup"
-  test:verbose: "arty exec judge run -v"
+  test/update: "arty exec judge run -u"
+  test/setup: "arty exec judge setup"
+  test/verbose: "arty exec judge run -v"

@@ -8,6 +8,15 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/test-helpers.sh"
 
+# Export tests dir
+export TESTS_DIR="$PWD/__tests"
+
+# Load test config
+source "${SCRIPT_DIR}/test-config.sh"
+if [ -f "${TESTS_DIR}/test-config.sh" ]; then
+	source "${TESTS_DIR}/test-config.sh"
+fi
+
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
@@ -154,13 +163,9 @@ EOF
 
 log_section "PRE-FLIGHT CHECKS"
 
-# Check for test files
-TEST_FILES=(
-    "test-example.sh"
-)
 
 for test_file in "${TEST_FILES[@]}"; do
-    if [ -f "${SCRIPT_DIR}/${test_file}" ]; then
+    if [ -f "${TESTS_DIR}/${test_file}" ]; then
         log_pass "Found ${test_file}"
     else
         log_warning "Missing ${test_file}"
@@ -204,12 +209,12 @@ run_test_suite() {
     local test_name="$2"
     local test_id="$3"
 
-    if [ ! -f "${SCRIPT_DIR}/${test_file}" ]; then
+    if [ ! -f "${TESTS_DIR}/${test_file}" ]; then
         log_skip "Test file not found: ${test_file}"
         return
     fi
 
-    chmod +x "${SCRIPT_DIR}/${test_file}"
+    chmod +x "${TESTS_DIR}/${test_file}"
 
     log_section "RUNNING: ${test_name}"
 
@@ -218,7 +223,7 @@ run_test_suite() {
     
     set +e
     {
-        bash "${SCRIPT_DIR}/${test_file}" 2>&1 | tee "$output_file"
+        bash "${TESTS_DIR}/${test_file}" 2>&1 | tee "$output_file"
     }
     local exit_code=${PIPESTATUS[0]}
     set -e

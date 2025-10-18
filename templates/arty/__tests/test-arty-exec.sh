@@ -4,10 +4,6 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ARTY_SH="${SCRIPT_DIR}/../arty.sh"
 
-# Source test helpers if available
-if [[ -f "${SCRIPT_DIR}/../../judge/test-helpers.sh" ]]; then
-    source "${SCRIPT_DIR}/../../judge/test-helpers.sh"
-fi
 
 # Setup before each test
 setup() {

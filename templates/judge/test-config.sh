@@ -1,31 +1,44 @@
 #!/usr/bin/env bash
-# Test configuration for arty.sh test suite
+# Test configuration for test suites
 # This file is sourced by test files to set common configuration
 
+# The nullglob option causes the array to be empty if there are no matches.
+shopt -s nullglob
+
 # Test directory structure
-export TEST_ROOT="${SCRIPT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
-export ARTY_SH_ROOT="${TEST_ROOT}/.."
-export SNAPSHOTS_DIR="${TEST_ROOT}/snapshots"
+export SNAPSHOTS_DIR="${TESTS_DIR}/snapshots"
+export TEMP_DIR="${TESTS_DIR}/temp"
 
-# Test behavior flags
-export ARTY_TEST_MODE=1
-export ARTY_SKIP_YQ_CHECK=0  # Set to 1 to skip yq availability check in tests
-
-# Color output in tests (set to 0 to disable)
-export ARTY_TEST_COLORS=1
+# Check for test files
+export TEST_FILES=($TESTS_DIR/tests-*.sh)
 
 # Snapshot configuration
 export SNAPSHOT_UPDATE="${UPDATE_SNAPSHOTS:-0}"
 export SNAPSHOT_VERBOSE="${VERBOSE:-0}"
 
-# Temp directory base
-export ARTY_TEST_TMP_BASE="${TMPDIR:-/tmp}"
+check() {
+    local description="$1"
+    local test_command="$2"
+    
+    printf "%-50s" "$description"
+    
+    if eval "$test_command" > /dev/null 2>&1; then
+        echo "✅ PASS"
+        ((checks_passed++))
+        return 0
+    else
+        echo "❌ FAIL"
+        ((checks_failed++))
+        return 1
+    fi
+}
+
 
 # Test utilities
 create_test_env() {
     local test_name="${1:-test}"
     local test_dir
-    test_dir=$(mktemp -d "${ARTY_TEST_TMP_BASE}/arty-test-${test_name}-XXXXXX")
+    test_dir=$(mktemp -d "${TEMP_DIR}/arty-test-${test_name}-XXXXXX")
     echo "$test_dir"
 }
 
@@ -55,3 +68,4 @@ export -f cleanup_test_env
 export -f assert_dir_exists
 export -f assert_success
 export -f assert_failure
+export -f check

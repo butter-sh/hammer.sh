@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 
-# {{project_name}} - Main entry point for test framework
+# judge.sh - Main entry point for test framework
 # Delegates commands to specialized scripts
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REAL_BASH_SOURCE="$(readlink -f "${BASH_SOURCE[0]}")"
+REAL_SCRIPT_DIR="$(cd "$(dirname "${REAL_BASH_SOURCE}")" && pwd)"
 
 # Colors for output
 RED='\033[0;31m'
@@ -16,10 +18,10 @@ NC='\033[0m'
 
 show_usage() {
     cat << EOF
-{{project_name}} - A bash testing framework with snapshot support
+judge.sh - A bash testing framework with snapshot support
 
 USAGE:
-    {{project_name}} <command> [options]
+    judge.sh <command> [options]
 
 COMMANDS:
     run      Run all tests (delegates to run-all-tests.sh)
@@ -29,32 +31,32 @@ COMMANDS:
 
 EXAMPLES:
     # Run all tests
-    {{project_name}} run
+    judge.sh run
 
     # Run tests with verbose output
-    {{project_name}} run -v
+    judge.sh run -v
 
     # Run specific test suite
-    {{project_name}} run -t my-test
+    judge.sh run -t my-test
 
     # Update snapshots
-    {{project_name}} run -u
+    judge.sh run -u
 
     # Initialize snapshots (first time setup)
-    {{project_name}} setup
+    judge.sh setup
 
     # List all snapshots
-    {{project_name}} snap list
+    judge.sh snap list
 
     # Compare snapshot with master
-    {{project_name}} snap diff test-name
+    judge.sh snap diff test-name
 
     # Show snapshot statistics
-    {{project_name}} snap stats
+    judge.sh snap stats
 
 For detailed command help:
-    {{project_name}} run --help
-    {{project_name}} snap --help
+    judge.sh run --help
+    judge.sh snap --help
 
 EOF
 }
@@ -67,19 +69,20 @@ main() {
 
     local command="$1"
     shift
+    
 
     case "$command" in
         run)
             # Delegate to run-all-tests.sh
-            exec bash "${SCRIPT_DIR}/run-all-tests.sh" "$@"
+            exec bash "${REAL_SCRIPT_DIR}/run-all-tests.sh" "$@"
             ;;
         setup)
             # Delegate to setup-snapshots.sh
-            exec bash "${SCRIPT_DIR}/setup-snapshots.sh" "$@"
+            exec bash "${REAL_SCRIPT_DIR}/setup-snapshots.sh" "$@"
             ;;
         snap)
             # Delegate to snapshot-tool.sh
-            exec bash "${SCRIPT_DIR}/snapshot-tool.sh" "$@"
+            exec bash "${REAL_SCRIPT_DIR}/snapshot-tool.sh" "$@"
             ;;
         help|--help|-h)
             show_usage
