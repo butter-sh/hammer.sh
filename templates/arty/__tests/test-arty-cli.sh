@@ -37,8 +37,8 @@ test_help_command() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "USAGE:"
-    assert_contains "$output" "COMMANDS:"
+    assert_contains "$output" "USAGE:" "Should show usage"
+    assert_contains "$output" "COMMANDS:" "Should show commands"
     
     teardown
 }
@@ -49,7 +49,7 @@ test_help_flag() {
     
     output=$(bash "$ARTY_SH" --help 2>&1)
     
-    assert_contains "$output" "USAGE:"
+    assert_contains "$output" "USAGE:" "Should show usage"
     
     teardown
 }
@@ -60,7 +60,7 @@ test_help_short_flag() {
     
     output=$(bash "$ARTY_SH" -h 2>&1)
     
-    assert_contains "$output" "USAGE:"
+    assert_contains "$output" "USAGE:" "Should show usage"
     
     teardown
 }
@@ -69,11 +69,14 @@ test_help_short_flag() {
 test_unknown_command() {
     setup
     
-    output=$(bash "$ARTY_SH" nonexistent-command 2>&1 || true)
+    set +e
+    output=$(bash "$ARTY_SH" nonexistent-command 2>&1)
+    exit_code=$?
+    set -e
     
     # Should either show error or try to run as script
     # Since no arty.yml exists, should show error
-    assert_true "[[ \$? -ne 0 ]]" "Unknown command should fail"
+    assert_true "[[ $exit_code -ne 0 ]]" "Unknown command should fail"
     
     teardown
 }
@@ -95,7 +98,7 @@ test_rm_alias() {
     
     output=$(bash "$ARTY_SH" rm 2>&1 || true)
     
-    assert_contains "$output" "Library name required"
+    assert_contains "$output" "Library name required" "Should require library name"
     
     teardown
 }
@@ -107,7 +110,7 @@ test_remove_nonexistent() {
     mkdir -p "$ARTY_HOME/libs"
     output=$(bash "$ARTY_SH" remove nonexistent 2>&1 || true)
     
-    assert_contains "$output" "not found"
+    assert_contains "$output" "not found" "Should not found"
     
     teardown
 }
@@ -118,7 +121,7 @@ test_source_requires_name() {
     
     output=$(bash "$ARTY_SH" source 2>&1 || true)
     
-    assert_contains "$output" "Library name required"
+    assert_contains "$output" "Library name required" "Should require library name"
     
     teardown
 }
@@ -130,14 +133,14 @@ test_usage_shows_commands() {
     output=$(bash "$ARTY_SH" help 2>&1)
     
     # Check for all major commands
-    assert_contains "$output" "install"
-    assert_contains "$output" "deps"
-    assert_contains "$output" "list"
-    assert_contains "$output" "remove"
-    assert_contains "$output" "init"
-    assert_contains "$output" "source"
-    assert_contains "$output" "exec"
-    assert_contains "$output" "help"
+    assert_contains "$output" "install" "Should show install"
+    assert_contains "$output" "deps" "Should show deps"
+    assert_contains "$output" "list" "Should show list"
+    assert_contains "$output" "remove" "Should show remove"
+    assert_contains "$output" "init" "Should show init"
+    assert_contains "$output" "source" "Should show source"
+    assert_contains "$output" "exec" "Should show exec"
+    assert_contains "$output" "help" "Should show help"
     
     teardown
 }
@@ -148,7 +151,7 @@ test_usage_shows_examples() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "EXAMPLES:"
+    assert_contains "$output" "EXAMPLES:" "Should show examples"
     
     teardown
 }
@@ -159,8 +162,8 @@ test_usage_shows_environment() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "ENVIRONMENT:"
-    assert_contains "$output" "ARTY_HOME"
+    assert_contains "$output" "ENVIRONMENT:" "Should show environment"
+    assert_contains "$output" "ARTY_HOME" "Should show arty home"
     
     teardown
 }
@@ -171,7 +174,7 @@ test_usage_shows_structure() {
     
     output=$(bash "$ARTY_SH" help 2>&1)
     
-    assert_contains "$output" "PROJECT STRUCTURE:"
+    assert_contains "$output" "PROJECT STRUCTURE:" "Should show project structure"
     
     teardown
 }
@@ -185,8 +188,8 @@ test_list_ls_alias() {
     output2=$(bash "$ARTY_SH" ls 2>&1)
     
     # Both should produce similar output
-    assert_contains "$output1" "libraries"
-    assert_contains "$output2" "libraries"
+    assert_contains "$output1" "libraries" "Should show libraries"
+    assert_contains "$output2" "libraries" "Should show libraries"
     
     teardown
 }
@@ -196,10 +199,13 @@ test_command_case_sensitive() {
     setup
     
     # HELP (uppercase) should not work
-    output=$(bash "$ARTY_SH" HELP 2>&1 || true)
+    set +e
+    output=$(bash "$ARTY_SH" HELP 2>&1)
+    exit_code=$?
+    set -e
     
     # Should fail as unknown command (unless there's a script named HELP)
-    assert_true "[[ $? -ne 0 ]]"
+    assert_true "[[ $exit_code -ne 0 ]]" "Case sensitive command should fail"
     
     teardown
 }
