@@ -20,6 +20,7 @@ VERSION="1.0.0"
 MYST_ENGINE_LIB="${BASH_SOURCE[0]}"
 
 # Colors for output - only use colors if output is to a terminal or if FORCE_COLOR is set
+export FORCE_COLOR=${FORCE_COLOR:-}
 if [[ -z "$FORCE_COLOR" ]]; then
 		if [[ "$FORCE_COLOR" = "1" ]]; then
 			export RED='\033[0;31m'

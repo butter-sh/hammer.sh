@@ -14,6 +14,7 @@ FONT_NAME="${FONT_NAME:-iconset}"
 ICON_CLASS="${ICON_CLASS:-icon}"
 
 # Colors for output - only use colors if output is to a terminal or if FORCE_COLOR is set
+export FORCE_COLOR=${FORCE_COLOR:-}
 if [[ -z "$FORCE_COLOR" ]]; then
 		if [[ "$FORCE_COLOR" = "1" ]]; then
 			export RED='\033[0;31m'
