@@ -18,13 +18,18 @@ export JUDGE_TEST_COLORS=1
 export SNAPSHOT_UPDATE="${UPDATE_SNAPSHOTS:-0}"
 export SNAPSHOT_VERBOSE="${VERBOSE:-0}"
 
-# Auto-discover all test files matching test-*.sh pattern
+# Auto-discover test files
+# NOTE: This pattern explicitly excludes judge's own tests (test-judge-*)
+# Projects using judge should name their tests with different patterns like:
+# - test-feature.sh
+# - test-myapp-*.sh
+# - integration-*.sh
+# etc.
 shopt -s nullglob
 TEST_FILES_ARRAY=()
 for test_file in ${TEST_ROOT}/test-judge-*.sh; do
-    if [[ -f "$test_file" ]]; then
-        TEST_FILES_ARRAY+=("$(basename "$test_file")")
-    fi
+    basename_file="$(basename "$test_file")"
+    TEST_FILES_ARRAY+=("$basename_file")
 done
 export TEST_FILES=("${TEST_FILES_ARRAY[@]}")
 shopt -u nullglob

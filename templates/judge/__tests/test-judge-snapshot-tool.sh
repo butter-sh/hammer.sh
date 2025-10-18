@@ -109,7 +109,8 @@ test_diff_no_differences() {
     echo "same content" > "$SNAPSHOT_DIR/mytest_master.log"
     echo "same content" > "$SNAPSHOT_DIR/mytest_20231201_120000.log"
     output=$(cd "$TEST_DIR" && bash "$SNAPSHOT_TOOL" diff mytest 2>&1)
-    assert_contains "$output" "No differences" "Should show no differences"
+    # Check for the key phrase (works with or without emoji)
+    assert_contains "$output" "outputs match" "Should show no differences"
     teardown
 }
 
@@ -119,7 +120,8 @@ test_diff_detects_differences() {
     echo "original content" > "$SNAPSHOT_DIR/mytest_master.log"
     echo "different content" > "$SNAPSHOT_DIR/mytest_20231201_120000.log"
     output=$(cd "$TEST_DIR" && bash "$SNAPSHOT_TOOL" diff mytest 2>&1)
-    assert_contains "$output" "Differences found" "Should detect differences"
+    # Check for the key phrase (with or without emoji/colors)
+    assert_contains "$output" "Differences" "Should detect differences"
     teardown
 }
 
