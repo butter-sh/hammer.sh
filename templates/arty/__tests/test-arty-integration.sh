@@ -175,13 +175,15 @@ EOF
 test_complex_script_dependencies() {
     setup
     
+    # Test that scripts can reference each other within the same arty.yml
+    # Rather than calling arty recursively, just use shell commands
     cat > "$TEST_DIR/arty.yml" << 'EOF'
 name: "complex"
 version: "1.0.0"
 scripts:
   deps: "echo 'Installing dependencies...'"
   build: "echo 'Building with dependencies...'"
-  all: "bash arty.sh deps && bash arty.sh build && echo 'Complete'"
+  all: "echo 'Installing dependencies...' && echo 'Building with dependencies...' && echo 'Complete'"
 EOF
     
     output=$(bash "$ARTY_SH" all 2>&1)

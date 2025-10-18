@@ -12,8 +12,8 @@ ARTY_LIBS_DIR="$ARTY_HOME/libs"
 ARTY_BIN_DIR="$ARTY_HOME/bin"
 ARTY_CONFIG_FILE="${ARTY_CONFIG_FILE:-arty.yml}"
 
-# Colors - only use colors if output is to a terminal
-if [[ -t 2 ]]; then
+# Colors - only use colors if output is to a terminal or if FORCE_COLOR is set
+if [[ -n "${FORCE_COLOR:-}" ]] || [[ -t 2 ]]; then
     RED='\033[0;31m'
     GREEN='\033[0;32m'
     YELLOW='\033[1;33m'
