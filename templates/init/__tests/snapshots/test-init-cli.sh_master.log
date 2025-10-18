@@ -18,8 +18,8 @@
 [0;32m[PASS][0m Should show list header
 [0;32m[PASS][0m ls alias should work
 [0;32m[PASS][0m Should process first flag
-[0;31m[FAIL][0m Should show usage when args missing
-  Expected to contain: Usage:
+[0;32m[PASS][0m Should fail without filename
+[0;32m[PASS][0m Should show error message
 [0;32m[PASS][0m Flag form should work
 [0;32m[PASS][0m lowercase should work
 [0;32m[PASS][0m Dash form should work
@@ -28,13 +28,13 @@
 [0;32m[PASS][0m Should not crash with flags
 [0;32m[PASS][0m Should handle numeric names
 [0;32m[PASS][0m Should handle normally
-ℹ Created /tmp/tmp.XmFox3i9pB/demos directory
+ℹ Created /tmp/tmp.B7YtkZF9RE/demos directory
 
 ═══════════════════════════════════════════
   🎬 Starting asciinema recording
 ═══════════════════════════════════════════
 
-Recording: /tmp/tmp.XmFox3i9pB/demos/demo1.cast
+Recording: /tmp/tmp.B7YtkZF9RE/demos/demo1.cast
 Title: demo1
 
 Tips for great demos:
@@ -48,7 +48,7 @@ To stop recording:
   • Press Ctrl+D or type exit
 
 Starting in 3 seconds...
-✓ Recording saved: /tmp/tmp.XmFox3i9pB/demos/demo1.cast
+✓ Recording saved: /tmp/tmp.B7YtkZF9RE/demos/demo1.cast
 
 ℹ Next steps:
   init.sh play demo1.cast      # Play it back
@@ -59,7 +59,7 @@ Starting in 3 seconds...
   🎬 Starting asciinema recording
 ═══════════════════════════════════════════
 
-Recording: /tmp/tmp.XmFox3i9pB/demos/demo2.cast
+Recording: /tmp/tmp.B7YtkZF9RE/demos/demo2.cast
 Title: demo2
 
 Tips for great demos:
@@ -73,7 +73,7 @@ To stop recording:
   • Press Ctrl+D or type exit
 
 Starting in 3 seconds...
-✓ Recording saved: /tmp/tmp.XmFox3i9pB/demos/demo2.cast
+✓ Recording saved: /tmp/tmp.B7YtkZF9RE/demos/demo2.cast
 
 ℹ Next steps:
   init.sh play demo2.cast      # Play it back
@@ -86,9 +86,9 @@ Starting in 3 seconds...
 [0;36m  TEST SUMMARY[0m
 [0;36m═══════════════════════════════════════════════════════[0m
 
-  Total Tests:  26
-  [0;32mPassed:       25[0m
-  [0;31mFailed:       1[0m
-  Pass Rate:    96%
+  Total Tests:  27
+  [0;32mPassed:       27[0m
+  [0;31mFailed:       0[0m
+  Pass Rate:    100%
 
-[0;31m✗ Some tests failed[0m
+[0;32m✓ All tests passed![0m

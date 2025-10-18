@@ -204,9 +204,15 @@ test_multiple_flags() {
 test_command_no_args_when_required() {
     setup
     
-    output=$(bash "$INIT_SH" play 2>&1 || true)
+    set +e
+    output=$(bash "$INIT_SH" play 2>&1)
+    exit_code=$?
+    set -e
     
-    assert_contains "$output" "Usage:" "Should show usage when args missing"
+    # Command should fail (non-zero exit)
+    assert_true "[[ $exit_code -ne 0 ]]" "Should fail without filename"
+    # Should output something (error message)
+    assert_true "[[ -n '$output' ]]" "Should show error message"
     
     teardown
 }

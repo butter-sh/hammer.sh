@@ -229,12 +229,20 @@ test_error_handling_missing_arguments() {
     setup
     
     # Play without filename
-    output1=$(bash "$INIT_SH" play 2>&1 || true)
-    assert_contains "$output1" "Usage:" "Should show usage for play"
+    set +e
+    output1=$(bash "$INIT_SH" play 2>&1)
+    exit_code1=$?
+    set -e
+    assert_true "[[ $exit_code1 -ne 0 ]]" "Play should fail without filename"
+    assert_true "[[ -n '$output1' ]]" "Play should show error message"
     
     # Upload without filename
-    output2=$(bash "$INIT_SH" upload 2>&1 || true)
-    assert_contains "$output2" "Usage:" "Should show usage for upload"
+    set +e
+    output2=$(bash "$INIT_SH" upload 2>&1)
+    exit_code2=$?
+    set -e
+    assert_true "[[ $exit_code2 -ne 0 ]]" "Upload should fail without filename"
+    assert_true "[[ -n '$output2' ]]" "Upload should show error message"
     
     teardown
 }

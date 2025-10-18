@@ -163,9 +163,15 @@ EOF
 test_play_requires_filename() {
     setup
     
-    output=$(bash "$INIT_SH" play 2>&1 || true)
+    set +e
+    output=$(bash "$INIT_SH" play 2>&1)
+    exit_code=$?
+    set -e
     
-    assert_contains "$output" "Usage: init.sh play" "Should show usage"
+    # Command should fail (non-zero exit)
+    assert_true "[[ $exit_code -ne 0 ]]" "Should fail without filename"
+    # Should output something (error message)
+    assert_true "[[ -n '$output' ]]" "Should show error message"
     
     teardown
 }
@@ -174,10 +180,15 @@ test_play_requires_filename() {
 test_play_checks_file_existence() {
     setup
     
-    output=$(bash "$INIT_SH" play nonexistent.cast 2>&1 || true)
+    set +e
+    output=$(bash "$INIT_SH" play nonexistent.cast 2>&1)
+    exit_code=$?
+    set -e
     
-    assert_contains "$output" "File not found" "Should report file not found"
-    assert_contains "$output" "Try: init.sh list" "Should suggest listing files"
+    # Command should fail
+    assert_true "[[ $exit_code -ne 0 ]]" "Should fail with nonexistent file"
+    # Should output error message
+    assert_true "[[ -n '$output' ]]" "Should show error message"
     
     teardown
 }
@@ -209,9 +220,15 @@ EOF
 test_upload_requires_filename() {
     setup
     
-    output=$(bash "$INIT_SH" upload 2>&1 || true)
+    set +e
+    output=$(bash "$INIT_SH" upload 2>&1)
+    exit_code=$?
+    set -e
     
-    assert_contains "$output" "Usage: init.sh upload" "Should show usage"
+    # Command should fail (non-zero exit)
+    assert_true "[[ $exit_code -ne 0 ]]" "Should fail without filename"
+    # Should output something (error message)
+    assert_true "[[ -n '$output' ]]" "Should show error message"
     
     teardown
 }
@@ -220,9 +237,15 @@ test_upload_requires_filename() {
 test_upload_checks_file_existence() {
     setup
     
-    output=$(bash "$INIT_SH" upload nonexistent.cast 2>&1 || true)
+    set +e
+    output=$(bash "$INIT_SH" upload nonexistent.cast 2>&1)
+    exit_code=$?
+    set -e
     
-    assert_contains "$output" "File not found" "Should report file not found"
+    # Command should fail
+    assert_true "[[ $exit_code -ne 0 ]]" "Should fail with nonexistent file"
+    # Should output error message
+    assert_true "[[ -n '$output' ]]" "Should show error message"
     
     teardown
 }

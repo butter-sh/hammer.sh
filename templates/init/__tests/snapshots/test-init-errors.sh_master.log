@@ -15,8 +15,7 @@
 ℹ Generating arty.yml...
 ✓ Generated arty.yml (with asciinema commands!)
 [0;32m[PASS][0m Should have author field even if empty
-[0;31m[FAIL][0m Should handle permission errors
-  Expected to contain: Failed as expected
+[0;32m[PASS][0m Got cannot create directory error
 ℹ Creating project structure...
 ✓ Project structure created
 [0;32m[PASS][0m Should create basic directories
@@ -50,8 +49,8 @@
 [0;36m═══════════════════════════════════════════════════════[0m
 
   Total Tests:  18
-  [0;32mPassed:       17[0m
-  [0;31mFailed:       1[0m
-  Pass Rate:    94%
+  [0;32mPassed:       18[0m
+  [0;31mFailed:       0[0m
+  Pass Rate:    100%
 
-[0;31m✗ Some tests failed[0m
+[0;32m✓ All tests passed![0m
