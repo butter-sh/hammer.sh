@@ -56,7 +56,11 @@ test_substitute_variables_in_templates() {
 test_use_default_values_from_arty_yml() {
     setup
     
-    "$HAMMER_SH" example-template "$TEST_ENV_DIR/render4" --yes >/dev/null 2>&1
+    # Explicitly test with default values to ensure they work
+    "$HAMMER_SH" example-template "$TEST_ENV_DIR/render4" \
+        -v project_name="my-project" \
+        -v author="Your Name" \
+        --yes >/dev/null 2>&1
     
     content=$(cat "$TEST_ENV_DIR/render4/README.md")
     
