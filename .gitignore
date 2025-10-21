@@ -1,0 +1,34 @@
+# .gitignore for hammer.sh
+
+# arty.sh dependencies
+.arty/
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Output directories (examples)
+output/
+dist/
+build/
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test output
+test-output/
+.test-results/
+
+# Documentation build
+docs/
+
+# Node modules (if using npm for tooling)
+node_modules/

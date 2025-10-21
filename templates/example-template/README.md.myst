@@ -1,0 +1,19 @@
+{{> _header}}
+
+# {{project_name}}
+
+**Author:** {{author}}  
+**License:** {{license}}  
+**Year:** {{year}}
+
+## Overview
+
+This is a template-generated project created with hammer.sh.
+
+## Features
+
+- Feature 1
+- Feature 2
+- Feature 3
+
+{{> _footer}}

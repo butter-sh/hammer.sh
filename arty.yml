@@ -1,0 +1,39 @@
+name: "@butter.sh/hammer.sh"
+version: "1.0.0"
+description: "CLI facade and generalization for myst.sh templating library"
+author: "valknar@pivoine.art"
+license: "MIT"
+
+references:
+- https://github.com/butter-sh/myst.sh.git
+- https://github.com/butter-sh/judge.sh.git
+- https://github.com/butter-sh/leaf.sh.git
+
+main: "hammer.sh"
+
+# Hammer template configurations
+hammer:
+  templates:
+    example-template:
+      description: "Example template demonstrating hammer.sh capabilities"
+      variables:
+        project_name:
+          description: "Name of the project"
+          default: "my-project"
+        author:
+          description: "Author of the project"
+          default: "Your Name"
+        license:
+          description: "Project license"
+          default: "MIT"
+        year:
+          description: "Current year"
+          default: "2025"
+
+scripts:
+  test: "arty exec judge run"
+  test/update: "arty exec judge run -u"
+  test/setup: "arty exec judge setup"
+  test/verbose: "arty exec judge run -v"
+  test/ci: "TERM=linux arty exec judge run"
+  docs: BASE_PATH=hammer.sh arty exec leaf . --logo ./icon.svg -o ./docs
