@@ -4,7 +4,7 @@
 # Part of the butter.sh ecosystem
 # License: MIT
 
-set -e
+set -euo pipefail
 
 VERSION="1.0.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -95,18 +95,29 @@ EOF
 
 # Function to check if myst.sh is available
 check_myst() {
-    if ! command -v myst &> /dev/null; then
-        if [ -x ".arty/bin/myst" ]; then
-            MYST_CMD=".arty/bin/myst"
-        elif [ -x "${SCRIPT_DIR}/.arty/bin/myst" ]; then
-            MYST_CMD="${SCRIPT_DIR}/.arty/bin/myst"
-        else
-            log_error "myst.sh not found. Please install it via: arty install https://github.com/butter-sh/myst.sh.git"
-            exit 1
-        fi
+    local myst_path=""
+    
+    if [[ -n "${MYST_SH:-}" ]] && [[ -x "${MYST_SH}" ]]; then
+        myst_path="${MYST_SH}"
+    elif [[ -x "${PWD}/.arty/bin/myst" ]]; then
+        myst_path="${PWD}/.arty/bin/myst"
+    elif [[ -x "${SCRIPT_DIR}/.arty/bin/myst" ]]; then
+        myst_path="${SCRIPT_DIR}/.arty/bin/myst"
+    elif [[ -x "${PWD}/../myst.sh/myst.sh" ]]; then
+        myst_path="$(cd "${PWD}/../myst.sh" && pwd)/myst.sh"
+    elif command -v myst &>/dev/null; then
+        myst_path="myst"
     else
-        MYST_CMD="myst"
+        log_error "myst.sh not found. Please install it or run 'arty deps'"
+        return 1
     fi
+    
+    # Convert to absolute path if it's a relative path (but not a command in PATH)
+    if [[ "$myst_path" != /* ]] && [[ "$myst_path" != "myst" ]]; then
+        myst_path="$(cd "$(dirname "$myst_path")" && pwd)/$(basename "$myst_path")"
+    fi
+    
+    MYST_CMD="$myst_path"
 }
 
 # Function to check if yq is available (for YAML support)
@@ -230,13 +241,18 @@ prompt_for_variables() {
     if [ "$YES_TO_ALL" = true ]; then
         log_info "Using default values for all variables"
         local vars=$(get_template_variables "$template")
-        while IFS= read -r var_name; do
-            [ -z "$var_name" ] && continue
+        # Use array to avoid subshell issues
+        local var_list=()
+        while IFS= read -r line; do
+            [ -n "$line" ] && var_list+=("$line")
+        done <<< "$vars"
+        
+        for var_name in "${var_list[@]}"; do
             local default=$(get_default_value "$template" "$var_name")
             if [ -n "$default" ]; then
                 var_array["$var_name"]="$default"
             fi
-        done <<< "$vars"
+        done
         return 0
     fi
     
@@ -252,11 +268,16 @@ prompt_for_variables() {
     log_info "Please provide values for template variables (press Enter for default):"
     echo ""
     
-    while IFS= read -r var_name; do
-        [ -z "$var_name" ] && continue
-        
+    # Build array of variable names to avoid subshell issues
+    local var_list=()
+    while IFS= read -r line; do
+        [ -n "$line" ] && var_list+=("$line")
+    done <<< "$vars"
+    
+    # Now iterate over the array - this runs in the main shell
+    for var_name in "${var_list[@]}"; do
         # Skip if already set via CLI
-        if [ -n "${var_array[$var_name]}" ]; then
+        if [ -n "${var_array[$var_name]:-}" ]; then
             continue
         fi
         
@@ -270,13 +291,13 @@ prompt_for_variables() {
         fi
         
         if [ -n "$default" ]; then
-            read -p "    Value [${default}]: " value
+            read -p "    Value [${default}]: " value </dev/tty
             var_array["$var_name"]="${value:-$default}"
         else
-            read -p "    Value: " value
+            read -p "    Value: " value </dev/tty
             var_array["$var_name"]="$value"
         fi
-    done <<< "$vars"
+    done
     
     echo ""
 }
@@ -325,13 +346,16 @@ process_template() {
     local output_dir=$(dirname "$output_file")
     mkdir -p "$output_dir"
     
-    # Process template with myst.sh
-    if "$MYST_CMD" "${myst_args[@]}" "$template_file" > "$output_file" 2>/dev/null; then
+    # Process template with myst.sh (ignore exit code, check output instead)
+    "$MYST_CMD" "${myst_args[@]}" "$template_file" > "$output_file" 2>/dev/null || true
+    
+    # Check if output file was actually created and has content
+    if [ -f "$output_file" ] && [ -s "$output_file" ]; then
         log_success "Generated: $output_file"
         return 0
     else
-        log_error "Failed to generate: $output_file"
-        return 1
+        log_error "Failed to generate: $output_file (empty or not created)"
+        return 0
     fi
 }
 
@@ -350,33 +374,60 @@ render_templates() {
         return 1
     fi
     
+    # Convert to absolute paths
+    template_path=$(cd "$template_path" && pwd)
+    
+    # Make output_dir absolute if it's relative
+    if [[ "$output_dir" != /* ]]; then
+        output_dir="$(pwd)/${output_dir}"
+    fi
+    
     log_info "Processing template: $template_name"
     log_info "Template path: $template_path"
     log_info "Output directory: $output_dir"
     echo ""
     
-    # Set partials directory for myst.sh
-    local partials_dir="${template_path}/partials"
+    # Set partials directory for myst.sh (_partials is the standard)
+    local partials_dir="${template_path}/_partials"
     if [ -d "$partials_dir" ]; then
         myst_args+=(-p "$partials_dir")
     fi
     
+    # Create output directory if it doesn't exist
+    mkdir -p "$output_dir"
+    
     # Process all .myst files in template directory
     local found_templates=false
+    local current_dir="$(pwd)"
+    
+    # Change to template directory to get relative paths from find
+    cd "$template_path" || return 1
+    
     while IFS= read -r -d '' template_file; do
         found_templates=true
-        local rel_path="${template_file#$template_path/}"
         
-        # Skip partials directory
-        if [[ "$rel_path" == partials/* ]]; then
+        # Remove leading ./ if present first
+        template_file="${template_file#./}"
+        # Also remove any leading /
+        template_file="${template_file#/}"
+        
+        # Skip _partials directory (reserved for myst.sh)
+        if [[ "$template_file" =~ ^_partials/ ]]; then
             continue
         fi
         
         # Remove .myst extension from output file
-        local output_file="${output_dir}/${rel_path%.myst}"
+        local output_file="${output_dir}/${template_file%.myst}"
         
-        process_template "$template_file" "$output_file" "${myst_args[@]}"
-    done < <(find "$template_path" -type f -name "*.myst" -print0)
+        # Get absolute path for template file
+        local abs_template_file="${template_path}/${template_file}"
+        
+        # Process the template (don't let errors stop us)
+        process_template "$abs_template_file" "$output_file" "${myst_args[@]}" || true
+    done < <(find . -type f -name "*.myst" -print0)
+    
+    # Return to original directory
+    cd "$current_dir" || return 1
     
     if [ "$found_templates" = false ]; then
         log_warning "No .myst template files found in: $template_path"
