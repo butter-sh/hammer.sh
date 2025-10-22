@@ -1,16 +1,17 @@
 <div align="center">
 
+<img src="./icon.svg" width="100" height="100" alt="hammer.sh">
+
 # hammer.sh
 
-**CLI Facade and Generalization for myst.sh Templating**
+**Project Scaffolding Tool**
 
 [![Organization](https://img.shields.io/badge/org-butter--sh-4ade80?style=for-the-badge&logo=github&logoColor=white)](https://github.com/butter-sh)
 [![License](https://img.shields.io/badge/license-MIT-86efac?style=for-the-badge)](LICENSE)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/butter-sh/hammer.sh/test.yml?branch=main&style=flat-square&logo=github&color=22c55e)](https://github.com/butter-sh/hammer.sh/actions)
-[![Version](https://img.shields.io/github/v/tag/butter-sh/hammer.sh?style=flat-square&label=version&color=4ade80)](https://github.com/butter-sh/hammer.sh/releases)
-[![butter.sh](https://img.shields.io/badge/butter.sh-hammer-22c55e?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjEgMTZWOGEyIDIgMCAwIDAtMS0xLjczbC03LTRhMiAyIDAgMCAwLTIgMGwtNyA0QTIgMiAwIDAgMCAzIDh2OGEyIDIgMCAwIDAgMSAxLjczbDcgNGEyIDIgMCAwIDAgMiAwbDctNEEyIDIgMCAwIDAgMjEgMTZ6IiBzdHJva2U9IiM0YWRlODAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBvbHlsaW5lIHBvaW50cz0iMy4yNyA2Ljk2IDEyIDEyLjAxIDIwLjczIDYuOTYiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48bGluZSB4MT0iMTIiIHkxPSIyMi4wOCIgeDI9IjEyIiB5Mj0iMTIiIHN0cm9rZT0iIzRhZGU4MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=)](https://butter-sh.github.io/hammer.sh)
+[![Version](https://img.shields.io/badge/version-1.0.0-22c55e?style=for-the-badge)](https://github.com/butter-sh/hammer.sh/releases)
+[![butter.sh](https://img.shields.io/badge/butter.sh-hammer-4ade80?style=for-the-badge)](https://butter-sh.github.io)
 
-*Simplified, user-friendly interface for the powerful myst.sh templating engine*
+*Intelligent project scaffolding with template-based generation and interactive configuration*
 
 [Documentation](https://butter-sh.github.io/hammer.sh) • [GitHub](https://github.com/butter-sh/hammer.sh) • [butter.sh](https://github.com/butter-sh)
 
@@ -18,437 +19,307 @@
 
 ---
 
-## Features
+## Overview
 
-- **CLI Facade** - Simplified interface for myst.sh templating
-- **Variable Management** - Read variables from CLI, JSON, YAML, or interactive prompts
-- **Smart Defaults** - Define default values in arty.yml for each template
-- **Template Organization** - Operate in current directory or dedicated template directories
-- **Interactive Mode** - Ask users for input with descriptions and defaults
-- **Batch Mode** - Use `--yes` flag to accept all defaults
-- **Smart Overwriting** - Interactive prompts for existing files with `--force` override
-- **Partial Support** - Automatically handles template partials via myst.sh
-- **arty.sh Integration** - Full integration with butter.sh ecosystem
+hammer.sh is a powerful project scaffolding tool that generates complete projects from templates. Built on top of myst.sh templating engine, it provides both interactive and batch modes for creating well-structured projects with consistent layouts.
+
+### Key Features
+
+- **Template-Based Generation** — Create projects from reusable templates
+- **Interactive Prompts** — Guided setup with user-friendly prompts
+- **Batch Mode** — Non-interactive generation with `--yes` flag
+- **Variable Substitution** — Dynamic content via myst.sh templating
+- **Smart Overwrite Detection** — Prevents accidental file overwrites
+- **Integration with myst.sh** — Leverages powerful templating features
+
+---
 
 ## Installation
 
 ### Using arty.sh
 
 ```bash
-# Add to your arty.yml
-references:
-  - https://github.com/butter-sh/hammer.sh.git
-
-# Install dependencies
-arty deps
-
-# Use via arty
+arty install https://github.com/butter-sh/hammer.sh.git
 arty exec hammer --help
 ```
 
-### Manual Install
+### Manual Installation
 
 ```bash
 git clone https://github.com/butter-sh/hammer.sh.git
 cd hammer.sh
-chmod +x hammer.sh
 sudo cp hammer.sh /usr/local/bin/hammer
+sudo chmod +x /usr/local/bin/hammer
 ```
 
-## Quick Start
+---
 
-### List Available Templates
+## Usage
+
+### Initialize a Project
 
 ```bash
-hammer --list
+# Interactive mode
+hammer init my-project
+
+# Batch mode (use defaults)
+hammer init my-project --yes
 ```
 
-### Generate from Template (Interactive)
+### Generate from Template
 
 ```bash
-# Interactive mode - prompts for each variable
-hammer example-template ./my-project
+# Use built-in template
+hammer new bash-script my-script
+
+# Use custom template directory
+hammer new my-template output-dir --template-dir ~/templates
+
+# List available templates
+hammer list
 ```
 
-### Generate with CLI Variables
+### Options
 
 ```bash
-hammer example-template -v project_name="MyApp" -v author="John Doe"
+-y, --yes              Non-interactive mode (use defaults)
+-t, --template-dir DIR Custom template directory
+-v, --var KEY=VALUE    Set template variable
+-h, --help             Show help message
 ```
 
-### Generate with Data Files
+---
 
-```bash
-# From JSON
-hammer example-template -j data.json -o ./output
+## Templates
 
-# From YAML
-hammer example-template -y config.yaml -o ./output
-```
+### Template Structure
 
-### Use Defaults Without Prompts
-
-```bash
-# Accept all default values
-hammer example-template --yes
-```
-
-### Force Overwrite Files
-
-```bash
-# Skip overwrite prompts
-hammer example-template ./my-project --force
-```
-
-## Template Structure
-
-Templates are organized in a dedicated `templates/` directory with the following structure:
+Templates are directories containing `.myst` files:
 
 ```
 templates/
 └── my-template/
-    ├── README.md.myst          # Main template file
-    ├── main.sh.myst            # Another template file
-    └── partials/               # Partial templates (optional)
-        ├── _header.myst
-        └── _footer.myst
+    ├── template.yml       # Template configuration
+    ├── {{name}}.sh.myst   # Template files
+    ├── README.md.myst
+    └── config/
+        └── settings.yml.myst
+```
+
+### Template Configuration
+
+**template.yml:**
+```yaml
+name: "my-template"
+description: "A project template"
+variables:
+  - name: project_name
+    prompt: "Enter project name:"
+    default: "my-project"
+  - name: author
+    prompt: "Author name:"
+    default: "Your Name"
+  - name: license
+    prompt: "License:"
+    default: "MIT"
 ```
 
 ### Template Files
 
-- Template files use the `.myst` extension
-- Use myst.sh syntax for variables: `{{variable_name}}`
-- Partials are included with: `{{> _partial_name}}`
-- Output files have `.myst` extension removed
+Files ending in `.myst` are processed through myst.sh:
 
-## Configuration with arty.yml
+**{{name}}.sh.myst:**
+```bash
+#!/usr/bin/env bash
 
-Define template variables and defaults in your `arty.yml`:
+# {{project_name}}
+# Author: {{author}}
+# License: {{license}}
+
+echo "Hello from {{project_name}}!"
+```
+
+---
+
+## Examples
+
+### Example 1: Bash Script Template
+
+```bash
+# Create bash script project
+hammer new bash-script awesome-tool
+
+# Output:
+# awesome-tool/
+# ├── awesome-tool.sh
+# ├── README.md
+# └── LICENSE
+```
+
+### Example 2: Custom Template
+
+**my-templates/webapp/template.yml:**
+```yaml
+name: "webapp"
+description: "Web application template"
+variables:
+  - name: app_name
+    prompt: "Application name:"
+  - name: port
+    prompt: "Port number:"
+    default: "3000"
+```
+
+**my-templates/webapp/server.js.myst:**
+```javascript
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send('Hello from {{app_name}}!');
+});
+
+app.listen({{port}}, () => {
+  console.log('{{app_name}} running on port {{port}}');
+});
+```
+
+**Usage:**
+```bash
+hammer new webapp my-app \
+  --template-dir my-templates \
+  --var app_name="My App" \
+  --var port=8080
+```
+
+### Example 3: arty.yml Project
+
+```bash
+# Generate arty.sh-compatible project
+hammer new arty my-library
+
+# Creates:
+# my-library/
+# ├── arty.yml
+# ├── my-library.sh
+# ├── __tests/
+# │   └── test-my-library.sh
+# ├── README.md
+# └── LICENSE
+```
+
+---
+
+## Integration with arty.sh
+
+Add hammer.sh to your project:
 
 ```yaml
-name: "@myorg/my-project"
+name: "my-project"
 version: "1.0.0"
+
+references:
+  - https://github.com/butter-sh/hammer.sh.git
+  - https://github.com/butter-sh/myst.sh.git
 
 hammer:
   templates:
-    my-template:
-      description: "My custom template"
-      variables:
-        project_name:
-          description: "Name of the project"
-          default: "my-project"
-        author:
-          description: "Author name"
-          default: "Your Name"
-        license:
-          description: "Project license"
-          default: "MIT"
+    - name: "component"
+      path: "templates/component"
+    - name: "service"
+      path: "templates/service"
+
+scripts:
+  new-component: "arty exec hammer new component"
+  new-service: "arty exec hammer new service"
 ```
 
-When using interactive mode, hammer.sh will:
-1. Show the variable description
-2. Display the default value
-3. Prompt user for input (Enter accepts default)
-
-## Usage Examples
-
-### Example 1: Interactive Generation
+Then run:
 
 ```bash
-$ hammer example-template ./my-new-project
-
-[ℹ] Please provide values for template variables (press Enter for default):
-
-  project_name: Name of the project
-    Value [my-project]: MyAwesomeProject
-  author: Author of the project
-    Value [Your Name]: John Developer
-  license: Project license
-    Value [MIT]: ↵
-
-[ℹ] Processing template: example-template
-[✓] Generated: ./my-new-project/README.md
-[✓] Generated: ./my-new-project/main.sh
-[✓] Template processing complete!
+arty deps            # Install hammer.sh and myst.sh
+arty new-component   # Generate component
+arty new-service     # Generate service
 ```
 
-### Example 2: Non-Interactive with Data File
-
-Create `project-data.json`:
-```json
-{
-  "project_name": "MyApp",
-  "author": "Jane Developer",
-  "license": "Apache-2.0",
-  "year": "2025"
-}
-```
-
-```bash
-hammer example-template -j project-data.json -o ./my-app --yes
-```
-
-### Example 3: Combining Options
-
-```bash
-# Use JSON for most variables, override one via CLI
-hammer example-template \
-  -j base-config.json \
-  -v author="Custom Author" \
-  -o ./output \
-  --force
-```
-
-### Example 4: Using in CI/CD
-
-```bash
-# Non-interactive mode with defaults
-hammer example-template --yes --force -o ./dist
-```
-
-## CLI Options
-
-### Arguments
-
-- `<template>` - Name of the template to use (required)
-- `[output-dir]` - Output directory (default: current directory)
-
-### Options
-
-- `-t, --template-dir DIR` - Custom template directory location
-- `-v, --var KEY=VALUE` - Set template variables (repeatable)
-- `-j, --json FILE` - Load variables from JSON file
-- `-y, --yaml FILE` - Load variables from YAML file (requires `yq`)
-- `-o, --output DIR` - Output directory
-- `-f, --force` - Force overwrite without prompting
-- `--yes` - Use default values without prompting
-- `-l, --list` - List available templates
-- `-h, --help` - Show help message
-- `--version` - Show version
+---
 
 ## Creating Custom Templates
 
 ### Step 1: Create Template Directory
 
 ```bash
-mkdir -p templates/my-template/partials
+mkdir -p my-templates/my-template
+cd my-templates/my-template
 ```
 
-### Step 2: Create Template Files
+### Step 2: Create Configuration
 
-Create `templates/my-template/README.md.myst`:
-```mustache
+**template.yml:**
+```yaml
+name: "my-template"
+description: "My custom template"
+variables:
+  - name: project_name
+    prompt: "Project name:"
+  - name: author
+    prompt: "Your name:"
+    default: "$USER"
+```
+
+### Step 3: Create Template Files
+
+**README.md.myst:**
+```markdown
 # {{project_name}}
 
 Created by {{author}}
 
-## Description
+## Installation
 
-{{description}}
+\`\`\`bash
+git clone {{project_name}}.git
+\`\`\`
 ```
 
-Create `templates/my-template/partials/_header.myst`:
-```mustache
-<!-- Header for {{project_name}} -->
-```
-
-### Step 3: Define Variables in arty.yml
-
-```yaml
-hammer:
-  templates:
-    my-template:
-      description: "My custom template"
-      variables:
-        project_name:
-          description: "Project name"
-          default: "new-project"
-        author:
-          description: "Author name"
-          default: "Your Name"
-        description:
-          description: "Project description"
-          default: "A new project"
-```
-
-### Step 4: Use Your Template
+### Step 4: Use Template
 
 ```bash
-hammer my-template ./output
+hammer new my-template output-dir \
+  --template-dir my-templates
 ```
 
-## Variable Sources (Priority Order)
-
-hammer.sh merges variables from multiple sources in this priority order (highest to lowest):
-
-1. **CLI variables** (`-v, --var`)
-2. **JSON file** (`-j, --json`)
-3. **YAML file** (`-y, --yaml`)
-4. **Interactive prompts** (if not using `--yes`)
-5. **Default values** from `arty.yml`
-
-## Interactive Mode Behavior
-
-### Default Mode (Interactive)
-- Prompts for each undefined variable
-- Shows variable description from arty.yml
-- Displays default value
-- User can press Enter to accept default
-
-### With `--yes` Flag
-- Skips all prompts
-- Uses default values from arty.yml
-- Fails if no default is defined
-
-### With `--force` Flag
-- Skips overwrite confirmations
-- Automatically overwrites existing files
-- Can be combined with `--yes`
-
-## Integration with myst.sh
-
-hammer.sh is a wrapper around [myst.sh](https://github.com/butter-sh/myst.sh) and supports all myst.sh template features:
-
-- **Variables**: `{{variable_name}}`
-- **Conditionals**: `{{#if condition}}...{{/if}}`
-- **Loops**: `{{#each items}}...{{/each}}`
-- **Partials**: `{{> partial_name}}`
-- **Comments**: `{{! comment }}`
-
-## Dependencies
-
-### Required
-- `bash` 4.0+
-- `myst.sh` - Install via arty.sh or manually
-
-### Optional
-- `yq` - For YAML file support
-- `arty.sh` - For dependency management
-
-## Examples Directory Structure
-
-A complete example project structure:
-
-```
-my-project/
-├── arty.yml                    # Project configuration
-├── hammer.sh                   # Hammer script (if local)
-└── templates/
-    ├── web-app/
-    │   ├── index.html.myst
-    │   ├── package.json.myst
-    │   └── partials/
-    │       ├── _head.myst
-    │       └── _footer.myst
-    └── cli-tool/
-        ├── README.md.myst
-        ├── main.sh.myst
-        └── setup.sh.myst
-```
-
-## Use Cases
-
-- **Project Scaffolding** - Generate new project structures
-- **Documentation** - Create standardized documentation
-- **Configuration Files** - Generate config files from templates
-- **Code Generation** - Generate boilerplate code
-- **CI/CD Templates** - Create pipeline configurations
-- **Multi-Environment Configs** - Generate environment-specific files
-
-## Workflow Examples
-
-### Development Workflow
-
-```bash
-# Developer creates new microservice
-hammer microservice-template \
-  -v service_name="user-service" \
-  -v author="DevTeam" \
-  -o ./services/user-service
-
-cd ./services/user-service
-arty deps
-npm install
-npm start
-```
-
-### CI/CD Workflow
-
-```bash
-# Automated deployment config generation
-hammer k8s-deployment \
-  -j environments/production.json \
-  --yes \
-  --force \
-  -o ./k8s/production
-
-kubectl apply -f ./k8s/production/
-```
-
-## Troubleshooting
-
-### Template Not Found
-
-```bash
-# Check available templates
-hammer --list
-
-# Specify custom template directory
-hammer --template-dir ./my-templates example-template
-```
-
-### Variable Not Defined
-
-Add default value to `arty.yml`:
-```yaml
-hammer:
-  templates:
-    my-template:
-      variables:
-        missing_var:
-          default: "default-value"
-```
-
-### myst.sh Not Found
-
-```bash
-# Install via arty.sh
-arty install https://github.com/butter-sh/myst.sh.git
-
-# Or install manually
-git clone https://github.com/butter-sh/myst.sh.git
-cd myst.sh
-./setup.sh
-```
+---
 
 ## Related Projects
 
-Part of the butter.sh ecosystem:
+Part of the [butter.sh](https://github.com/butter-sh) ecosystem:
 
-- **[arty.sh](https://github.com/butter-sh/arty.sh)** - Bash library dependency manager
-- **[myst.sh](https://github.com/butter-sh/myst.sh)** - Templating engine (required)
-- **[judge.sh](https://github.com/butter-sh/judge.sh)** - Testing framework
-- **[leaf.sh](https://github.com/butter-sh/leaf.sh)** - Documentation generator
-- **[whip.sh](https://github.com/butter-sh/whip.sh)** - Release management
+- **[arty.sh](https://github.com/butter-sh/arty.sh)** — Dependency manager
+- **[judge.sh](https://github.com/butter-sh/judge.sh)** — Testing framework
+- **[myst.sh](https://github.com/butter-sh/myst.sh)** — Templating engine (powers hammer.sh)
+- **[leaf.sh](https://github.com/butter-sh/leaf.sh)** — Documentation generator
+- **[whip.sh](https://github.com/butter-sh/whip.sh)** — Release management
+- **[clean.sh](https://github.com/butter-sh/clean.sh)** — Linter and formatter
+
+---
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details
+MIT License — see [LICENSE](LICENSE) file for details.
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Author
-
-Created by [valknar](https://github.com/valknarogg)
-
 ---
 
 <div align="center">
 
-Part of the [butter.sh](https://github.com/butter-sh) ecosystem
+**Part of the [butter.sh](https://github.com/butter-sh) ecosystem**
 
-**Unlimited. Independent. Fresh.**
+*Unlimited. Independent. Fresh.*
+
+Crafted by [Valknar](https://github.com/valknarogg)
 
 </div>
