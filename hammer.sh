@@ -26,19 +26,19 @@ INTERACTIVE=true
 
 # Function to print colored output
 log_info() {
-    echo -e "${BLUE}[ℹ]${NC} $1"
+  echo -e "${BLUE}[ℹ]${NC} $1"
 }
 
 log_success() {
-    echo -e "${GREEN}[✓]${NC} $1"
+  echo -e "${GREEN}[✓]${NC} $1"
 }
 
 log_warning() {
-    echo -e "${YELLOW}[!]${NC} $1"
+  echo -e "${YELLOW}[!]${NC} $1"
 }
 
 log_error() {
-    echo -e "${RED}[✗]${NC} $1" >&2
+  echo -e "${RED}[✗]${NC} $1" >&2
 }
 
 # Function to show usage
@@ -95,89 +95,89 @@ EOF
 
 # Function to check if myst.sh is available
 check_myst() {
-    local myst_path=""
+  local myst_path=""
     
-    if [[ -n "${MYST_SH:-}" ]] && [[ -x "${MYST_SH}" ]]; then
-        myst_path="${MYST_SH}"
+  if [[ -n "${MYST_SH:-}" ]] && [[ -x "${MYST_SH}" ]]; then
+    myst_path="${MYST_SH}"
     elif [[ -x "${PWD}/.arty/bin/myst" ]]; then
-        myst_path="${PWD}/.arty/bin/myst"
-    elif [[ -x "${SCRIPT_DIR}/.arty/bin/myst" ]]; then
+      myst_path="${PWD}/.arty/bin/myst"
+      elif [[ -x "${SCRIPT_DIR}/.arty/bin/myst" ]]; then
         myst_path="${SCRIPT_DIR}/.arty/bin/myst"
-    elif [[ -x "${PWD}/../myst.sh/myst.sh" ]]; then
-        myst_path="$(cd "${PWD}/../myst.sh" && pwd)/myst.sh"
-    elif command -v myst &>/dev/null; then
-        myst_path="myst"
-    else
-        log_error "myst.sh not found. Please install it or run 'arty deps'"
-        return 1
-    fi
+        elif [[ -x "${PWD}/../myst.sh/myst.sh" ]]; then
+          myst_path="$(cd "${PWD}/../myst.sh" && pwd)/myst.sh"
+          elif command -v myst &>/dev/null; then
+            myst_path="myst"
+            else
+            log_error "myst.sh not found. Please install it or run 'arty deps'"
+            return 1
+          fi
     
     # Convert to absolute path if it's a relative path (but not a command in PATH)
-    if [[ "$myst_path" != /* ]] && [[ "$myst_path" != "myst" ]]; then
-        myst_path="$(cd "$(dirname "$myst_path")" && pwd)/$(basename "$myst_path")"
-    fi
+          if [[ "$myst_path" != /* ]] && [[ "$myst_path" != "myst" ]]; then
+            myst_path="$(cd "$(dirname "$myst_path")" && pwd)/$(basename "$myst_path")"
+          fi
     
-    MYST_CMD="$myst_path"
-}
+          MYST_CMD="$myst_path"
+        }
 
 # Function to check if yq is available (for YAML support)
-check_yq() {
-    if ! command -v yq &> /dev/null; then
-        log_warning "yq not found. YAML file support will be limited."
-        log_info "Install yq from: https://github.com/mikefarah/yq"
-        return 1
-    fi
-    return 0
-}
+        check_yq() {
+          if ! command -v yq &> /dev/null; then
+            log_warning "yq not found. YAML file support will be limited."
+            log_info "Install yq from: https://github.com/mikefarah/yq"
+            return 1
+          fi
+          return 0
+        }
 
 # Function to find template directory
-find_template_dir() {
-    local custom_dir="$1"
+      find_template_dir() {
+        local custom_dir="$1"
     
-    if [ -n "$custom_dir" ] && [ -d "$custom_dir" ]; then
-        echo "$custom_dir"
-        return 0
-    fi
+        if [[ -n "$custom_dir" ]] && [[ -d "$custom_dir" ]]; then
+          echo "$custom_dir"
+          return 0
+        fi
     
     # Check current directory
-    if [ -d "./templates" ]; then
-        echo "./templates"
-        return 0
-    fi
+        if [[ -d "./templates" ]]; then
+          echo "./templates"
+          return 0
+        fi
     
     # Check script directory
-    if [ -d "${SCRIPT_DIR}/templates" ]; then
-        echo "${SCRIPT_DIR}/templates"
-        return 0
-    fi
+        if [ -d "${SCRIPT_DIR}/templates" ]; then
+          echo "${SCRIPT_DIR}/templates"
+          return 0
+        fi
     
     # Check if we're in an arty.sh project with hammer templates
-    if [ -f "$ARTY_CONFIG" ] && command -v yq &> /dev/null; then
-        local hammer_templates=$(yq eval '.hammer.templates | keys | .[]' "$ARTY_CONFIG" 2>/dev/null | head -1)
-        if [ -n "$hammer_templates" ]; then
+        if [[ -f "$ARTY_CONFIG" ]] && command -v yq &> /dev/null; then
+          local hammer_templates=$(yq eval '.hammer.templates | keys | .[]' "$ARTY_CONFIG" 2>/dev/null | head -1)
+          if [[ -n "$hammer_templates" ]]; then
             echo "./templates"
             return 0
+          fi
         fi
-    fi
     
-    log_error "Template directory not found"
-    return 1
-}
+        log_error "Template directory not found"
+        return 1
+      }
 
 # Function to list available templates
-list_templates() {
-    local template_dir="$1"
+      list_templates() {
+        local template_dir="$1"
     
-    log_info "Available templates in: $template_dir"
-    echo ""
+        log_info "Available templates in: $template_dir"
+        echo ""
     
-    if [ -f "$ARTY_CONFIG" ] && command -v yq &> /dev/null; then
+        if [[ -f "$ARTY_CONFIG" ]] && command -v yq &> /dev/null; then
         # List from arty.yml if available
-        local templates=$(yq eval '.hammer.templates | keys | .[]' "$ARTY_CONFIG" 2>/dev/null)
-        if [ -n "$templates" ]; then
+          local templates=$(yq eval '.hammer.templates | keys | .[]' "$ARTY_CONFIG" 2>/dev/null)
+          if [[ -n "$templates" ]]; then
             while IFS= read -r template; do
-                local desc=$(yq eval ".hammer.templates.${template}.description" "$ARTY_CONFIG" 2>/dev/null)
-                printf "  ${GREEN}%-20s${NC} %s\n" "$template" "$desc"
+              local desc=$(yq eval ".hammer.templates.${template}.description" "$ARTY_CONFIG" 2>/dev/null)
+              printf "  ${GREEN}%-20s${NC} %s\n" "$template" "$desc"
             done <<< "$templates"
             return 0
         fi
