@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔨 hammer.sh
+# hammer.sh
 
 **CLI Facade and Generalization for myst.sh Templating**
 
@@ -20,15 +20,15 @@
 
 ## Features
 
-- 🔨 **CLI Facade** - Simplified interface for myst.sh templating
-- 📋 **Variable Management** - Read variables from CLI, JSON, YAML, or interactive prompts
-- 🎯 **Smart Defaults** - Define default values in arty.yml for each template
-- 📁 **Template Organization** - Operate in current directory or dedicated template directories
-- 🔄 **Interactive Mode** - Ask users for input with descriptions and defaults
-- ⚡ **Batch Mode** - Use `--yes` flag to accept all defaults
-- 🛡️ **Smart Overwriting** - Interactive prompts for existing files with `--force` override
-- 🧩 **Partial Support** - Automatically handles template partials via myst.sh
-- 📦 **arty.sh Integration** - Full integration with butter.sh ecosystem
+- **CLI Facade** - Simplified interface for myst.sh templating
+- **Variable Management** - Read variables from CLI, JSON, YAML, or interactive prompts
+- **Smart Defaults** - Define default values in arty.yml for each template
+- **Template Organization** - Operate in current directory or dedicated template directories
+- **Interactive Mode** - Ask users for input with descriptions and defaults
+- **Batch Mode** - Use `--yes` flag to accept all defaults
+- **Smart Overwriting** - Interactive prompts for existing files with `--force` override
+- **Partial Support** - Automatically handles template partials via myst.sh
+- **arty.sh Integration** - Full integration with butter.sh ecosystem
 
 ## Installation
 
