@@ -1,4 +1,4 @@
-name: "@butter.sh/hammer.sh"
+name: "hammer.sh"
 version: "1.0.0"
 description: "CLI facade and generalization for myst.sh templating library"
 author: "valknar@pivoine.art"
