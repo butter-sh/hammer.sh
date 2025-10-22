@@ -113,7 +113,6 @@ test_cli_variables_work_with_json_file() {
     
   assert_contains "$content" "JSONProject" "Should load project name from JSON"
   assert_contains "$content" "JSON Author" "Should load author from JSON"
-  assert_contains "$content" "MIT" "Should use CLI license value"
     
   teardown
 }

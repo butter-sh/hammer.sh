@@ -43,7 +43,7 @@ log_error() {
 
 # Function to show usage
 show_usage() {
-    cat << EOF
+  cat <<EOF
 hammer.sh v${VERSION} - CLI facade for myst.sh templating
 
 USAGE:
@@ -96,7 +96,7 @@ EOF
 # Function to check if myst.sh is available
 check_myst() {
   local myst_path=""
-    
+
   if [[ -n "${MYST_SH:-}" ]] && [[ -x "${MYST_SH}" ]]; then
     myst_path="${MYST_SH}"
     elif [[ -x "${PWD}/.arty/bin/myst" ]]; then
@@ -111,18 +111,18 @@ check_myst() {
             log_error "myst.sh not found. Please install it or run 'arty deps'"
             return 1
           fi
-    
-    # Convert to absolute path if it's a relative path (but not a command in PATH)
+
+  # Convert to absolute path if it's a relative path (but not a command in PATH)
           if [[ "$myst_path" != /* ]] && [[ "$myst_path" != "myst" ]]; then
             myst_path="$(cd "$(dirname "$myst_path")" && pwd)/$(basename "$myst_path")"
           fi
-    
+
           MYST_CMD="$myst_path"
         }
 
 # Function to check if yq is available (for YAML support)
         check_yq() {
-          if ! command -v yq &> /dev/null; then
+          if ! command -v yq &>/dev/null; then
             log_warning "yq not found. YAML file support will be limited."
             log_info "Install yq from: https://github.com/mikefarah/yq"
             return 1
@@ -133,33 +133,33 @@ check_myst() {
 # Function to find template directory
       find_template_dir() {
         local custom_dir="$1"
-    
+
         if [[ -n "$custom_dir" ]] && [[ -d "$custom_dir" ]]; then
           echo "$custom_dir"
           return 0
         fi
-    
-    # Check current directory
+
+  # Check current directory
         if [[ -d "./templates" ]]; then
           echo "./templates"
           return 0
         fi
-    
-    # Check script directory
+
+  # Check script directory
         if [ -d "${SCRIPT_DIR}/templates" ]; then
           echo "${SCRIPT_DIR}/templates"
           return 0
         fi
-    
-    # Check if we're in an arty.sh project with hammer templates
-        if [[ -f "$ARTY_CONFIG" ]] && command -v yq &> /dev/null; then
+
+  # Check if we're in an arty.sh project with hammer templates
+        if [[ -f "$ARTY_CONFIG" ]] && command -v yq &>/dev/null; then
           local hammer_templates=$(yq eval '.hammer.templates | keys | .[]' "$ARTY_CONFIG" 2>/dev/null | head -1)
           if [[ -n "$hammer_templates" ]]; then
             echo "./templates"
             return 0
           fi
         fi
-    
+
         log_error "Template directory not found"
         return 1
       }
@@ -167,420 +167,420 @@ check_myst() {
 # Function to list available templates
       list_templates() {
         local template_dir="$1"
-    
+
         log_info "Available templates in: $template_dir"
         echo ""
-    
-        if [[ -f "$ARTY_CONFIG" ]] && command -v yq &> /dev/null; then
-        # List from arty.yml if available
+
+        if [[ -f "$ARTY_CONFIG" ]] && command -v yq &>/dev/null; then
+    # List from arty.yml if available
           local templates=$(yq eval '.hammer.templates | keys | .[]' "$ARTY_CONFIG" 2>/dev/null)
           if [[ -n "$templates" ]]; then
             while IFS= read -r template; do
               local desc=$(yq eval ".hammer.templates.${template}.description" "$ARTY_CONFIG" 2>/dev/null)
               printf "  ${GREEN}%-20s${NC} %s\n" "$template" "$desc"
-            done <<< "$templates"
-            return 0
-        fi
+      done <<<"$templates"
+      return 0
     fi
-    
-    # Fallback to directory listing
-    for dir in "$template_dir"/*; do
-        if [ -d "$dir" ]; then
-            local template_name=$(basename "$dir")
-            printf "  ${GREEN}%-20s${NC}\n" "$template_name"
-        fi
-    done
+  fi
+
+  # Fallback to directory listing
+  for dir in "$template_dir"/*; do
+    if [ -d "$dir" ]; then
+      local template_name=$(basename "$dir")
+      printf "  ${GREEN}%-20s${NC}\n" "$template_name"
+    fi
+  done
 }
 
 # Function to get default value from arty.yml
 get_default_value() {
-    local template="$1"
-    local var_name="$2"
-    
-    if [ -f "$ARTY_CONFIG" ] && command -v yq &> /dev/null; then
-        local default=$(yq eval ".hammer.templates.${template}.variables.${var_name}.default" "$ARTY_CONFIG" 2>/dev/null)
-        if [ "$default" != "null" ] && [ -n "$default" ]; then
-            echo "$default"
-            return 0
-        fi
+  local template="$1"
+  local var_name="$2"
+
+  if [ -f "$ARTY_CONFIG" ] && command -v yq &>/dev/null; then
+    local default=$(yq eval ".hammer.templates.${template}.variables.${var_name}.default" "$ARTY_CONFIG" 2>/dev/null)
+    if [ "$default" != "null" ] && [ -n "$default" ]; then
+      echo "$default"
+      return 0
     fi
-    
-    echo ""
+  fi
+
+  echo ""
 }
 
 # Function to get variable description from arty.yml
 get_var_description() {
-    local template="$1"
-    local var_name="$2"
-    
-    if [ -f "$ARTY_CONFIG" ] && command -v yq &> /dev/null; then
-        local desc=$(yq eval ".hammer.templates.${template}.variables.${var_name}.description" "$ARTY_CONFIG" 2>/dev/null)
-        if [ "$desc" != "null" ] && [ -n "$desc" ]; then
-            echo "$desc"
-            return 0
-        fi
+  local template="$1"
+  local var_name="$2"
+
+  if [ -f "$ARTY_CONFIG" ] && command -v yq &>/dev/null; then
+    local desc=$(yq eval ".hammer.templates.${template}.variables.${var_name}.description" "$ARTY_CONFIG" 2>/dev/null)
+    if [ "$desc" != "null" ] && [ -n "$desc" ]; then
+      echo "$desc"
+      return 0
     fi
-    
-    echo ""
+  fi
+
+  echo ""
 }
 
 # Function to get all template variables from arty.yml
 get_template_variables() {
-    local template="$1"
-    
-    if [ -f "$ARTY_CONFIG" ] && command -v yq &> /dev/null; then
-        yq eval ".hammer.templates.${template}.variables | keys | .[]" "$ARTY_CONFIG" 2>/dev/null
-    fi
+  local template="$1"
+
+  if [ -f "$ARTY_CONFIG" ] && command -v yq &>/dev/null; then
+    yq eval ".hammer.templates.${template}.variables | keys | .[]" "$ARTY_CONFIG" 2>/dev/null
+  fi
 }
 
 # Function to prompt for variables
 prompt_for_variables() {
-    local template="$1"
-    local -n var_array=$2
-    
-    if [ "$YES_TO_ALL" = true ]; then
-        log_info "Using default values for all variables"
-        local vars=$(get_template_variables "$template")
-        # Use array to avoid subshell issues
-        local var_list=()
-        while IFS= read -r line; do
-            [ -n "$line" ] && var_list+=("$line")
-        done <<< "$vars"
-        
-        for var_name in "${var_list[@]}"; do
-            local default=$(get_default_value "$template" "$var_name")
-            if [ -n "$default" ]; then
-                var_array["$var_name"]="$default"
-            fi
-        done
-        return 0
-    fi
-    
-    if [ "$INTERACTIVE" = false ]; then
-        return 0
-    fi
-    
+  local template="$1"
+  local -n var_array=$2
+
+  if [ "$YES_TO_ALL" = true ]; then
+    log_info "Using default values for all variables"
     local vars=$(get_template_variables "$template")
-    if [ -z "$vars" ]; then
-        return 0
-    fi
-    
-    log_info "Please provide values for template variables (press Enter for default):"
-    echo ""
-    
-    # Build array of variable names to avoid subshell issues
+    # Use array to avoid subshell issues
     local var_list=()
     while IFS= read -r line; do
-        [ -n "$line" ] && var_list+=("$line")
-    done <<< "$vars"
-    
-    # Now iterate over the array - this runs in the main shell
+      [ -n "$line" ] && var_list+=("$line")
+    done <<<"$vars"
+
     for var_name in "${var_list[@]}"; do
-        # Skip if already set via CLI
-        if [ -n "${var_array[$var_name]:-}" ]; then
-            continue
-        fi
-        
-        local default=$(get_default_value "$template" "$var_name")
-        local desc=$(get_var_description "$template" "$var_name")
-        
-        if [ -n "$desc" ]; then
-            echo -e "  ${YELLOW}${var_name}${NC}: $desc"
-        else
-            echo -e "  ${YELLOW}${var_name}${NC}:"
-        fi
-        
-        if [ -n "$default" ]; then
-            read -p "    Value [${default}]: " value </dev/tty
-            var_array["$var_name"]="${value:-$default}"
-        else
-            read -p "    Value: " value </dev/tty
-            var_array["$var_name"]="$value"
-        fi
+      local default=$(get_default_value "$template" "$var_name")
+      if [ -n "$default" ]; then
+        var_array["$var_name"]="$default"
+      fi
     done
-    
-    echo ""
+    return 0
+  fi
+
+  if [ "$INTERACTIVE" = false ]; then
+    return 0
+  fi
+
+  local vars=$(get_template_variables "$template")
+  if [ -z "$vars" ]; then
+    return 0
+  fi
+
+  log_info "Please provide values for template variables (press Enter for default):"
+  echo ""
+
+  # Build array of variable names to avoid subshell issues
+  local var_list=()
+  while IFS= read -r line; do
+    [ -n "$line" ] && var_list+=("$line")
+  done <<<"$vars"
+
+  # Now iterate over the array - this runs in the main shell
+  for var_name in "${var_list[@]}"; do
+    # Skip if already set via CLI
+    if [ -n "${var_array[$var_name]:-}" ]; then
+      continue
+    fi
+
+    local default=$(get_default_value "$template" "$var_name")
+    local desc=$(get_var_description "$template" "$var_name")
+
+    if [ -n "$desc" ]; then
+      echo -e "  ${YELLOW}${var_name}${NC}: $desc"
+    else
+      echo -e "  ${YELLOW}${var_name}${NC}:"
+    fi
+
+    if [ -n "$default" ]; then
+      read -p "    Value [${default}]: " value </dev/tty
+      var_array["$var_name"]="${value:-$default}"
+    else
+      read -p "    Value: " value </dev/tty
+      var_array["$var_name"]="$value"
+    fi
+  done
+
+  echo ""
 }
 
 # Function to check if file should be overwritten
 should_overwrite() {
-    local file="$1"
-    
-    if [ ! -f "$file" ]; then
-        return 0
-    fi
-    
-    if [ "$FORCE_OVERWRITE" = true ]; then
-        return 0
-    fi
-    
-    if [ "$INTERACTIVE" = false ]; then
-        return 1
-    fi
-    
-    log_warning "File already exists: $file"
-    read -p "Overwrite? (y/N): " -n 1 -r
-    echo
-    
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        return 0
-    else
-        return 1
-    fi
+  local file="$1"
+
+  if [ ! -f "$file" ]; then
+    return 0
+  fi
+
+  if [ "$FORCE_OVERWRITE" = true ]; then
+    return 0
+  fi
+
+  if [ "$INTERACTIVE" = false ]; then
+    return 1
+  fi
+
+  log_warning "File already exists: $file"
+  read -p "Overwrite? (y/N): " -n 1 -r
+  echo
+
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 # Function to process template with myst.sh
 process_template() {
-    local template_file="$1"
-    local output_file="$2"
-    shift 2
-    local myst_args=("$@")
-    
-    # Check if output file should be overwritten
-    if ! should_overwrite "$output_file"; then
-        log_info "Skipping: $output_file"
-        return 0
-    fi
-    
-    # Create output directory if needed
-    local output_dir=$(dirname "$output_file")
-    mkdir -p "$output_dir"
-    
-    # Process template with myst.sh (ignore exit code, check output instead)
-    "$MYST_CMD" "${myst_args[@]}" "$template_file" > "$output_file" 2>/dev/null || true
-    
-    # Check if output file was actually created and has content
-    if [ -f "$output_file" ] && [ -s "$output_file" ]; then
-        log_success "Generated: $output_file"
-        return 0
-    else
-        log_error "Failed to generate: $output_file (empty or not created)"
-        return 0
-    fi
+  local template_file="$1"
+  local output_file="$2"
+  shift 2
+  local myst_args=("$@")
+
+  # Check if output file should be overwritten
+  if ! should_overwrite "$output_file"; then
+    log_info "Skipping: $output_file"
+    return 0
+  fi
+
+  # Create output directory if needed
+  local output_dir=$(dirname "$output_file")
+  mkdir -p "$output_dir"
+
+  # Process template with myst.sh (ignore exit code, check output instead)
+  "$MYST_CMD" "${myst_args[@]}" "$template_file" >"$output_file" 2>/dev/null || true
+
+  # Check if output file was actually created and has content
+  if [ -f "$output_file" ] && [ -s "$output_file" ]; then
+    log_success "Generated: $output_file"
+    return 0
+  else
+    log_error "Failed to generate: $output_file (empty or not created)"
+    return 0
+  fi
 }
 
 # Function to render templates
 render_templates() {
-    local template_name="$1"
-    local template_dir="$2"
-    local output_dir="$3"
-    shift 3
-    local myst_args=("$@")
-    
-    local template_path="${template_dir}/${template_name}"
-    
-    if [ ! -d "$template_path" ]; then
-        log_error "Template not found: $template_name"
-        return 1
+  local template_name="$1"
+  local template_dir="$2"
+  local output_dir="$3"
+  shift 3
+  local myst_args=("$@")
+
+  local template_path="${template_dir}/${template_name}"
+
+  if [ ! -d "$template_path" ]; then
+    log_error "Template not found: $template_name"
+    return 1
+  fi
+
+  # Convert to absolute paths
+  template_path=$(cd "$template_path" && pwd)
+
+  # Make output_dir absolute if it's relative
+  if [[ "$output_dir" != /* ]]; then
+    output_dir="$(pwd)/${output_dir}"
+  fi
+
+  log_info "Processing template: $template_name"
+  log_info "Template path: $template_path"
+  log_info "Output directory: $output_dir"
+  echo ""
+
+  # Set partials directory for myst.sh (_partials is the standard)
+  local partials_dir="$(dirname $template_path)/_partials"
+  if [ -d "$partials_dir" ]; then
+    myst_args+=(-p "$partials_dir")
+  fi
+
+  # Create output directory if it doesn't exist
+  mkdir -p "$output_dir"
+
+  # Process all .myst files in template directory
+  local found_templates=false
+  local current_dir="$(pwd)"
+
+  # Change to template directory to get relative paths from find
+  cd "$template_path" || return 1
+
+  while IFS= read -r -d '' template_file; do
+    found_templates=true
+
+    # Remove leading ./ if present first
+    template_file="${template_file#./}"
+    # Also remove any leading /
+    template_file="${template_file#/}"
+
+    # Skip _partials directory (reserved for myst.sh)
+    if [[ "$template_file" =~ ^_partials/ ]]; then
+      continue
     fi
-    
-    # Convert to absolute paths
-    template_path=$(cd "$template_path" && pwd)
-    
-    # Make output_dir absolute if it's relative
-    if [[ "$output_dir" != /* ]]; then
-        output_dir="$(pwd)/${output_dir}"
-    fi
-    
-    log_info "Processing template: $template_name"
-    log_info "Template path: $template_path"
-    log_info "Output directory: $output_dir"
-    echo ""
-    
-    # Set partials directory for myst.sh (_partials is the standard)
-    local partials_dir="${template_path}/_partials"
-    if [ -d "$partials_dir" ]; then
-        myst_args+=(-p "$partials_dir")
-    fi
-    
-    # Create output directory if it doesn't exist
-    mkdir -p "$output_dir"
-    
-    # Process all .myst files in template directory
-    local found_templates=false
-    local current_dir="$(pwd)"
-    
-    # Change to template directory to get relative paths from find
-    cd "$template_path" || return 1
-    
-    while IFS= read -r -d '' template_file; do
-        found_templates=true
-        
-        # Remove leading ./ if present first
-        template_file="${template_file#./}"
-        # Also remove any leading /
-        template_file="${template_file#/}"
-        
-        # Skip _partials directory (reserved for myst.sh)
-        if [[ "$template_file" =~ ^_partials/ ]]; then
-            continue
-        fi
-        
-        # Remove .myst extension from output file
-        local output_file="${output_dir}/${template_file%.myst}"
-        
-        # Get absolute path for template file
-        local abs_template_file="${template_path}/${template_file}"
-        
-        # Process the template (don't let errors stop us)
-        process_template "$abs_template_file" "$output_file" "${myst_args[@]}" || true
-    done < <(find . -type f -name "*.myst" -print0)
-    
-    # Return to original directory
-    cd "$current_dir" || return 1
-    
-    if [ "$found_templates" = false ]; then
-        log_warning "No .myst template files found in: $template_path"
-        return 1
-    fi
-    
-    echo ""
-    log_success "Template processing complete!"
-    
-    return 0
+
+    # Remove .myst extension from output file
+    local output_file="${output_dir}/${template_file%.myst}"
+
+    # Get absolute path for template file
+    local abs_template_file="${template_path}/${template_file}"
+
+    # Process the template (don't let errors stop us)
+    process_template "$abs_template_file" "$output_file" "${myst_args[@]}" || true
+  done < <(find . -type f -name "*.myst" -print0)
+
+  # Return to original directory
+  cd "$current_dir" || return 1
+
+  if [ "$found_templates" = false ]; then
+    log_warning "No .myst template files found in: $template_path"
+    return 1
+  fi
+
+  echo ""
+  log_success "Template processing complete!"
+
+  return 0
 }
 
 # Main function
 main() {
-    local template_name=""
-    local template_dir=""
-    local output_dir=""
-    local json_file=""
-    local yaml_file=""
-    declare -A variables
-    local list_templates_flag=false
-    
-    # Parse arguments
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            -h|--help)
-                show_usage
-                exit 0
-                ;;
-            --version)
-                echo "hammer.sh version $VERSION"
-                exit 0
-                ;;
-            -l|--list)
-                list_templates_flag=true
-                shift
-                ;;
-            -t|--template-dir)
-                template_dir="$2"
-                shift 2
-                ;;
-            -v|--var)
-                if [[ "$2" == *"="* ]]; then
-                    local key="${2%%=*}"
-                    local value="${2#*=}"
-                    variables["$key"]="$value"
-                else
-                    log_error "Invalid variable format: $2 (expected KEY=VALUE)"
-                    exit 1
-                fi
-                shift 2
-                ;;
-            -j|--json)
-                json_file="$2"
-                shift 2
-                ;;
-            -y|--yaml)
-                yaml_file="$2"
-                shift 2
-                ;;
-            -o|--output)
-                output_dir="$2"
-                shift 2
-                ;;
-            -f|--force)
-                FORCE_OVERWRITE=true
-                shift
-                ;;
-            --yes)
-                YES_TO_ALL=true
-                shift
-                ;;
-            -*)
-                log_error "Unknown option: $1"
-                show_usage
-                exit 1
-                ;;
-            *)
-                if [ -z "$template_name" ]; then
-                    template_name="$1"
-                elif [ -z "$output_dir" ]; then
-                    output_dir="$1"
-                else
-                    log_error "Too many arguments"
-                    show_usage
-                    exit 1
-                fi
-                shift
-                ;;
-        esac
-    done
-    
-    # Check dependencies
-    check_myst
-    
-    # Find template directory
-    template_dir=$(find_template_dir "$template_dir")
-    if [ $? -ne 0 ]; then
+  local template_name=""
+  local template_dir=""
+  local output_dir=""
+  local json_file=""
+  local yaml_file=""
+  declare -A variables
+  local list_templates_flag=false
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -h | --help)
+      show_usage
+      exit 0
+      ;;
+    --version)
+      echo "hammer.sh version $VERSION"
+      exit 0
+      ;;
+    -l | --list)
+      list_templates_flag=true
+      shift
+      ;;
+    -t | --template-dir)
+      template_dir="$2"
+      shift 2
+      ;;
+    -v | --var)
+      if [[ "$2" == *"="* ]]; then
+        local key="${2%%=*}"
+        local value="${2#*=}"
+        variables["$key"]="$value"
+      else
+        log_error "Invalid variable format: $2 (expected KEY=VALUE)"
         exit 1
-    fi
-    
-    # List templates if requested
-    if [ "$list_templates_flag" = true ]; then
-        list_templates "$template_dir"
-        exit 0
-    fi
-    
-    # Validate template name
-    if [ -z "$template_name" ]; then
-        log_error "Template name is required"
-        echo ""
+      fi
+      shift 2
+      ;;
+    -j | --json)
+      json_file="$2"
+      shift 2
+      ;;
+    -y | --yaml)
+      yaml_file="$2"
+      shift 2
+      ;;
+    -o | --output)
+      output_dir="$2"
+      shift 2
+      ;;
+    -f | --force)
+      FORCE_OVERWRITE=true
+      shift
+      ;;
+    --yes)
+      YES_TO_ALL=true
+      shift
+      ;;
+    -*)
+      log_error "Unknown option: $1"
+      show_usage
+      exit 1
+      ;;
+    *)
+      if [ -z "$template_name" ]; then
+        template_name="$1"
+      elif [ -z "$output_dir" ]; then
+        output_dir="$1"
+      else
+        log_error "Too many arguments"
         show_usage
         exit 1
+      fi
+      shift
+      ;;
+    esac
+  done
+
+  # Check dependencies
+  check_myst
+
+  # Find template directory
+  template_dir=$(find_template_dir "$template_dir")
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+
+  # List templates if requested
+  if [ "$list_templates_flag" = true ]; then
+    list_templates "$template_dir"
+    exit 0
+  fi
+
+  # Validate template name
+  if [ -z "$template_name" ]; then
+    log_error "Template name is required"
+    echo ""
+    show_usage
+    exit 1
+  fi
+
+  # Set default output directory
+  output_dir="${output_dir:-$DEFAULT_OUTPUT_DIR}"
+
+  # Prompt for variables if needed
+  prompt_for_variables "$template_name" variables
+
+  # Build myst.sh arguments
+  local myst_args=()
+
+  # Add variables
+  for key in "${!variables[@]}"; do
+    myst_args+=(-v "${key}=${variables[$key]}")
+  done
+
+  # Add JSON file if provided
+  if [ -n "$json_file" ]; then
+    if [ ! -f "$json_file" ]; then
+      log_error "JSON file not found: $json_file"
+      exit 1
     fi
-    
-    # Set default output directory
-    output_dir="${output_dir:-$DEFAULT_OUTPUT_DIR}"
-    
-    # Prompt for variables if needed
-    prompt_for_variables "$template_name" variables
-    
-    # Build myst.sh arguments
-    local myst_args=()
-    
-    # Add variables
-    for key in "${!variables[@]}"; do
-        myst_args+=(-v "${key}=${variables[$key]}")
-    done
-    
-    # Add JSON file if provided
-    if [ -n "$json_file" ]; then
-        if [ ! -f "$json_file" ]; then
-            log_error "JSON file not found: $json_file"
-            exit 1
-        fi
-        myst_args+=(-j "$json_file")
+    myst_args+=(-j "$json_file")
+  fi
+
+  # Add YAML file if provided
+  if [ -n "$yaml_file" ]; then
+    if ! check_yq; then
+      log_error "yq is required for YAML file support"
+      exit 1
     fi
-    
-    # Add YAML file if provided
-    if [ -n "$yaml_file" ]; then
-        if ! check_yq; then
-            log_error "yq is required for YAML file support"
-            exit 1
-        fi
-        if [ ! -f "$yaml_file" ]; then
-            log_error "YAML file not found: $yaml_file"
-            exit 1
-        fi
-        myst_args+=(-y "$yaml_file")
+    if [ ! -f "$yaml_file" ]; then
+      log_error "YAML file not found: $yaml_file"
+      exit 1
     fi
-    
-    # Render templates
-    render_templates "$template_name" "$template_dir" "$output_dir" "${myst_args[@]}"
+    myst_args+=(-y "$yaml_file")
+  fi
+
+  # Render templates
+  render_templates "$template_name" "$template_dir" "$output_dir" "${myst_args[@]}"
 }
 
 # Run main function
